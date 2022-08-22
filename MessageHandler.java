@@ -15,6 +15,7 @@ class MessageClassifier extends Thread{
             System.out.println("["+message.ip+"] requesting ip addresses");
             String ips = Server.getIps();
             Message newMessage = new Message(1,ips);
+            System.out.println("messageSent:"+newMessage.toString());
             Server.sendMessage(message.ip, newMessage);
             return;
         }
