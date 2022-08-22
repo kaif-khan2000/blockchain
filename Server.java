@@ -106,7 +106,9 @@ public class Server extends Thread {
     }
 
     public static void sendMessage(String ip, Message message) {
-
+        if(ip.equals(Message.tempIp)){
+            return;
+        }
         int index = fetchIndex(ip);
         if (index == -1) {
             System.out.println("IP is not connected.");
@@ -126,8 +128,9 @@ public class Server extends Thread {
         } catch (IOException i) {
             System.out.println(i);
         }
-        System.out.println("sending message to " + ip);
+        System.out.println("\nsending message to " + ip);
         out.println(message.toString());
+        System.out.println("\nmessage sent to " + ip + " "+ message.toString() + "\n");
         
     }
 
@@ -212,9 +215,9 @@ public class Server extends Thread {
         }
         new Wallet().start();
         try{
-            System.out.println(Message.tempIp);
+            //System.out.println(Message.tempIp);
             if(!Message.tempIp.equals(seed)){
-                System.out.println("Establishing connection with seed " + seed);
+                System.out.println("\nEstablishing connection with seed " + seed+"\n");
                 connectToServer(seed);
                 Message message = new Message(0,"hello");
                 sendMessage(seed, message);
