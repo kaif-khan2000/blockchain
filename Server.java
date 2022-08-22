@@ -210,7 +210,7 @@ public class Server extends Thread {
             client[i].setName("ServerThread-" + i);
             client[i].start();
         }
-        
+        new Wallet().start();
         try{
             System.out.println(Message.tempIp);
             if(!Message.tempIp.equals(seed)){
@@ -223,7 +223,7 @@ public class Server extends Thread {
             System.out.println("UserError1:" + e);
             e.printStackTrace();
         }
-
+        
         
         // for (int i= 0;i<ip.length;i++){
         //     try{

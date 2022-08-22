@@ -1,6 +1,7 @@
-
+import java.sql.*;
 import minibitcoin.*;
 import java.security.*;
+import java.security.spec.*;
 import java.security.spec.ECGenParameterSpec;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,30 +11,31 @@ import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 
-public class Wallet {
+public class Wallet extends Thread {
     public PrivateKey privateKey;
     public PublicKey publicKey;
 
     public HashMap<String, TransactionOutput> UTXOs = new HashMap<String, TransactionOutput>();
 
     public Wallet() {
-        generateKeyPair();
+        // generateKeyPair();
     }
 
-    public void generateKeyPair() {
-        try {
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA", "BC");
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
-            // Initialize the key generator and generate the keypair
-            keyGen.initialize(ecSpec, random); // used to get 256byte acceptable security level
-            KeyPair keyPair = keyGen.generateKeyPair();
-            privateKey = keyPair.getPrivate();
-            publicKey = keyPair.getPublic();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    // public void generateKeyPair() {
+    // try {
+    // KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA","BC");
+    // SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+    // ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
+    // // Initialize the key generator and generate the keypair
+    // keyGen.initialize(ecSpec, random); // used to get 256byte acceptable security
+    // level
+    // KeyPair keyPair = keyGen.generateKeyPair();
+    // privateKey = keyPair.getPrivate();
+    // publicKey = keyPair.getPublic();
+    // } catch (Exception e) {
+    // throw new RuntimeException(e);
+    // }
+    // }
 
     public float getBalance() {
         float total = 0;
@@ -72,12 +74,74 @@ public class Wallet {
         return newTransaction;
     }
 
-    public static void main(String[] args) {
-        
+    public void generateKeyPair() {
+        try {
+            Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+            db obj = new db();
+            Connection conn = obj.con;
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("select * from wallet");
+            if (!rs.isBeforeFirst()) {
+                // no keys
+                try {
+                    KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA", "BC");
+                    SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+                    ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
+                    // Initialize the key generator and generate the keypair
+                    keyGen.initialize(ecSpec, random); // used to get 256byte acceptable security level
+                    KeyPair keyPair = keyGen.generateKeyPair();
+                    privateKey = keyPair.getPrivate();
+                    publicKey = keyPair.getPublic();
+
+                    String pubkey = StringUtil.getStringFromKey(publicKey);
+                    String prvkey = StringUtil.getStringFromKey(privateKey);
+                    ;
+                    // db obj = new db();
+                    // Connection conn=obj.con;
+                    try {
+                        Statement stmt = conn.createStatement();
+                        System.out.println("insert into wallet(privatekey,publickey) values('" +
+                                prvkey + "','" +
+                                pubkey +
+                                "');");
+                        int rset = stmt.executeUpdate("insert into wallet(privatekey,publickey) values('" +
+                                prvkey + "','" +
+                                pubkey +
+                                "');");
+                        if (rset > 0)
+                            System.out.println("Successfully Inserted");
+                        else
+                            System.out.println("Insert Failed");
+                    } catch (SQLException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                // keys in database
+                if (rs.next()) {
+                    publicKey = StringUtil.getPublicKeyFromString(rs.getString(3));
+                    privateKey = StringUtil.getPrivateKeyFromString(rs.getString(2));
+                    // System.out.println("pk gen"+publicKey);
+                }
+
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    public void run() {
+        generateKeyPair();
         JFrame f = new JFrame("Wallet");
-        
+
         JPanel sendBox = new JPanel();
-        
+
         JButton send = new JButton("Send");
 
         JPanel addressLayout = new JPanel();
@@ -85,7 +149,7 @@ public class Wallet {
         JPanel myAddressLayout = new JPanel();
         myAddressLayout.setLayout(new BorderLayout());
         JLabel myAddress_title = new JLabel("Your Address: ");
-        JLabel myAddress = new JLabel();
+        JLabel myAddress = new JLabel(StringUtil.getStringFromKey(publicKey));
         myAddressLayout.add(myAddress_title, BorderLayout.WEST);
         myAddressLayout.add(myAddress, BorderLayout.EAST);
 
@@ -114,7 +178,7 @@ public class Wallet {
         sendBox.add(addressLayout, BorderLayout.NORTH);
         sendBox.add(sendLayout, BorderLayout.SOUTH);
 
-        //SEND
+        // SEND
         send.addActionListener(l -> {
             String from = myAddress.getText();
             String toAddress = to.getText();
@@ -124,19 +188,18 @@ public class Wallet {
             PublicKey fromkey = StringUtil.getPublicKeyFromString(from);
             PublicKey tokey = StringUtil.getPublicKeyFromString(toAddress);
             Transaction tr = new Transaction(fromkey, tokey, amountToSend, inputs);
-            Server.broadcast(new Message(2,tr.toString()));
-        } );
-        
-        //setup GUI
+            tr.generateSignature(privateKey);
+            Server.broadcast(new Message(2, tr.toString()));
+        });
+
+        // setup GUI
         f.setSize(800, 600);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.getContentPane().setLayout(new FlowLayout());       
-        
-        f.getContentPane().add(sendBox);
-        
-        f.setVisible(true);
+        f.getContentPane().setLayout(new FlowLayout());
 
-    
+        f.getContentPane().add(sendBox);
+
+        f.setVisible(true);
 
     }
 }
