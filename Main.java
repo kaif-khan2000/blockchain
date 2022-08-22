@@ -33,7 +33,7 @@ public class Main {
         Message[] messagepool = new Message[10];
         int messageCount = 0;
         Transaction[] mempool = new Transaction[10];
-        CollectTransactions collectTransactions = new CollectTransactions(mempool);
+        //CollectTransactions collectTransactions = new CollectTransactions(mempool);
         
         Server.build(messagepool,messageCount);
         // Mining mining = new Mining(mempool);

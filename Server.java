@@ -207,7 +207,9 @@ public class Server extends Thread {
         }
         
         try{
-            connectToServer(seed);
+            if(!Message.tempIp.equals(seed)){
+                connectToServer(seed);
+            }
         } catch (Exception e) {
             System.out.println("UserError:" + e);
         }
