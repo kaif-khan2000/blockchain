@@ -69,6 +69,7 @@ public class Server extends Thread {
             System.out.println("disc:IP is not connected.");
             return;
         }
+        index -= n;
         try {
             servers[index].server1.close();
             servers[index] = null;
@@ -89,7 +90,6 @@ public class Server extends Thread {
     }
 
     public static int fetchIndex(String ipAddress) {
-        System.out.println(ipAddress);
         for (int i = 0; i < 2*n; i++) {
             if (ip[i] != null && ip[i] != "") {
                 try{
@@ -128,6 +128,7 @@ public class Server extends Thread {
         }
         System.out.println("sending message to " + ip);
         out.println(message.toString());
+        
     }
 
     public static void broadcast(Message message) {

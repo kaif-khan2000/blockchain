@@ -31,7 +31,7 @@ class MessageClassifier extends Thread{
                     System.out.println("UserError:" + e);
                 }
             }
-            if (ips.length>0)
+            if (ips.length>1)
                 Server.disconnectFromServer(Server.seed);
             return;
         }
@@ -66,7 +66,9 @@ public class MessageHandler {
             messagepool[messageCount] = message;
             messageCount++;
             msgLookUp.put(message.mId, message.timestamp);
-            new MessageClassifier(message).start();
+            MessageClassifier m = new MessageClassifier(message);
+            m.start();
+            
         }
     }
 }

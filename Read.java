@@ -28,6 +28,7 @@ class Read extends Thread {
 				}
 				Message message = new Message(msg);
 				MessageHandler.addToMessagepool(message);
+				System.out.println("Testing2");
 			}
 		}catch(Exception e){
 			System.out.println(e);
