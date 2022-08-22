@@ -12,6 +12,7 @@ class MessageClassifier extends Thread{
     public void run() {
         if(message.mType == 0){
             // requesting ip addresses
+            System.out.println("["+message.ip+"] requesting ip addresses");
             String ips = Server.getIps();
             Message newMessage = new Message(1,ips);
             Server.sendMessage(message.ip, newMessage);
@@ -20,7 +21,7 @@ class MessageClassifier extends Thread{
 
         if (message.mType == 1) {
             // we have received ip addresses
-            System.out.println(message.data);
+            System.out.println("type 1:"+message.data);
             String[] ips = message.data.split(",");
             for (String ip :ips){
                 try{
