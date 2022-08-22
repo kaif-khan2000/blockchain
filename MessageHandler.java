@@ -20,6 +20,7 @@ class MessageClassifier extends Thread{
 
         if (message.mType == 1) {
             // we have received ip addresses
+            System.out.println(message.data);
             String[] ips = message.data.split(",");
             for (String ip :ips){
                 try{
