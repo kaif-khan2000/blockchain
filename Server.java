@@ -1,0 +1,224 @@
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class Server extends Thread {
+    public static String seed = "192.168.134.158";
+    private static ServerSocket server;
+    boolean isServer = false;
+    public static int n = 5;
+    public Socket client1;
+    public Socket server1 = null;
+    public static Server servers[] = new Server[n];
+    public static Server client[] = new Server[n];
+    public static final int port = 8080;
+    public static String clientIps;
+    
+    static {
+        try {
+            server = new ServerSocket(8080);
+            for (int i = 0; i < n; i++) {
+                servers[i] = null;
+            }
+        } catch (IOException e) {
+            System.out.println("UserError: " + e);
+        }
+    }
+
+    public static Message[] messagepool;
+    public static int mCount;
+    public static String ip[] = new String[100];
+    
+    public static String getIps() {
+        String ips = "";
+        for (int i = 0; i < 2*n; i++) {
+            if (ip[i] != null && !ip[i].equals("")) { 
+                ips += ip[i] + ",";
+            }
+        }
+        return ips;
+    }
+
+    public static void connectToServer(String ip1) {
+        
+        System.out.println(ip1);
+        if (ip1.equals("")) {
+            System.out.println("IP field is empty.");
+            return;
+        }
+        if (fetchIndex(ip1) != -1) {
+            System.out.println("IP is already connected.");
+            return;
+        }
+        int index = fetchNullIndex();
+        if (index == -1) {
+            System.out.println("No space left to connect.");
+            return;
+        }
+        ip[n + index] = ip1;
+        servers[index] = new Server(false);
+        servers[index].setName("ClientThread-" + index);
+        servers[index].start();
+    }
+    
+    public static void disconnectFromServer(String ip1) {
+        int index = fetchIndex(ip1);
+        if (index == -1) {
+            System.out.println("IP is not connected.");
+            return;
+        }
+        try {
+            servers[index].server1.close();
+            servers[index] = null;
+            ip[n + index] = null;
+        } catch (IOException e) {
+            System.out.println("UserError: " + e);
+        }
+    }
+
+    public static int fetchNullIndex() {
+        for (int i = 0; i < n; i++) {
+            if (servers[i] == null) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int fetchIndex(String ipAddress) {
+        System.out.println(ipAddress);
+        for (int i = 0; i < 2*n; i++) {
+            if (ip[i] != null && ip[i] != "") {
+                try{
+                    if (ip[i].equals(ipAddress)) {
+                        return i;
+                    }
+                } catch (NullPointerException e) {
+                    System.out.println("NullPointerException: " + e);
+                }
+                
+            }
+        }
+        return -1;
+    }
+
+    public static void sendMessage(String ip, Message message) {
+
+        int index = fetchIndex(ip);
+        if (index == -1) {
+            System.out.println("IP is not connected.");
+            return;
+        }
+        PrintWriter out = null;
+        try {
+            if (index < n) {
+                out = new PrintWriter(client[index].client1.getOutputStream(), true);
+            } else {
+                try{
+                    out = new PrintWriter(servers[index - n].server1.getOutputStream(), true);
+                } catch (NullPointerException e) {
+                    System.out.println("NullPointerException: " + e);
+                }
+            }
+        } catch (IOException i) {
+            System.out.println(i);
+        }
+        out.println(message.toString());
+    }
+
+    public static void broadcast(Message message) {
+        for(int i=0;i<2*n;i++){
+            if(ip[i]!=null && ip[i]!=""){
+                sendMessage(ip[i], message);
+            }
+        }
+    }
+
+    public Server(boolean isServer) {
+        this.isServer = isServer;
+        
+    }
+
+    public void serverFunction() {
+        try {
+            int index = Integer.parseInt(Thread.currentThread().getName().replace("ServerThread-", ""));
+            while (true) {
+
+                System.out.println(Thread.currentThread().getName() + " Waiting for client to join");
+                client1 = server.accept();
+                System.out.println("Client joined");
+                ip[index] = client1.getInetAddress().toString().replace("/", "");
+                // PrintWriter out = new PrintWriter(client1.getOutputStream(), true);
+                // out.println("Hello Client");
+                // out.close();
+                Read thread = new Read(client1);
+                thread.start();
+                thread.join();
+                client1.close();
+                ip[index] = "";
+            }
+        } catch (IOException i) {
+            System.out.println("UserError:" + i);
+        } catch (Exception e) {
+            System.out.println("UserError:" + e);
+        }
+
+    }
+
+    public void clientFunction() {
+        int index = Integer.parseInt(Thread.currentThread().getName().replace("ClientThread-", ""));
+        try {
+            index = n + index;
+            System.out.println(Thread.currentThread().getName() + " Waiting for client to join");
+            server1 = new Socket(ip[index], port);
+            System.out.println("Connected to server " + ip[index]);
+            Read thread = new Read(server1);
+            thread.start();
+            thread.join();
+            server1.close();
+            ip[index] = "";
+            servers[index - n] = null;
+
+        } catch (IOException i) {
+            System.out.println("UserError:" + i);
+            ip[index] = "";
+        } catch (Exception e) {
+            System.out.println("UserError:" + e);
+        }
+    }
+
+    public void run() {
+        if (isServer) {
+            serverFunction();
+        } else {
+            clientFunction();
+        }
+    }
+
+    public static void build(Message[] messagepool1, int messageCount) {
+        
+        String[] ip = {"192.168.134.152"};
+        messagepool = messagepool1;
+        mCount = messageCount;
+        for (int i = 0; i < n; i++) {
+            client[i] = new Server(true);
+            client[i].setName("ServerThread-" + i);
+            client[i].start();
+        }
+        
+        try{
+            connectToServer(seed);
+        } catch (Exception e) {
+            System.out.println("UserError:" + e);
+        }
+
+        
+        // for (int i= 0;i<ip.length;i++){
+        //     try{
+        //         connectToServer(ip[i]);
+        //     } catch (Exception e){
+        //         System.out.println("UserError:" + e);
+        //     }
+        // }
+    }
+}
