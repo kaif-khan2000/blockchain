@@ -3,7 +3,7 @@ import java.net.*;
 import java.util.*;
 
 public class Server extends Thread {
-    public static String seed = "192.168.134.158";
+    public static String seed = "192.168.134.190";
     private static ServerSocket server;
     boolean isServer = false;
     public static int n = 5;
@@ -71,6 +71,7 @@ public class Server extends Thread {
             servers[index].server1.close();
             servers[index] = null;
             ip[n + index] = null;
+            System.out.println("Disconnected from " + ip1);
         } catch (IOException e) {
             System.out.println("UserError: " + e);
         }
@@ -208,6 +209,7 @@ public class Server extends Thread {
         
         try{
             if(!Message.tempIp.equals(seed)){
+                System.out.println("Establishing connection with seed " + seed);
                 connectToServer(seed);
             }
         } catch (Exception e) {
