@@ -26,8 +26,8 @@ class Read extends Thread {
 					
 					break;
 				}
-				System.out.println("\b\b["+ip+"]: "+msg);
-				System.out.print(">>");
+				Message message = new Message(msg);
+				MessageHandler.addToMessagepool(message);
 			}
 		}catch(Exception e){
 			System.out.println(e);

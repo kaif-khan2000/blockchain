@@ -211,6 +211,8 @@ public class Server extends Thread {
             if(!Message.tempIp.equals(seed)){
                 System.out.println("Establishing connection with seed " + seed);
                 connectToServer(seed);
+                Message message = new Message(0,"hello");
+                sendMessage(seed, message);
             }
         } catch (Exception e) {
             System.out.println("UserError:" + e);

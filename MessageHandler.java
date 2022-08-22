@@ -37,7 +37,7 @@ class MessageClassifier extends Thread{
     }
 }
 
-public class MessageHadler {
+public class MessageHandler {
     /*
      * collect all messages statistically.
      * if the message is a transaction, add it to the mempool.
@@ -63,6 +63,7 @@ public class MessageHadler {
             messagepool[messageCount] = message;
             messageCount++;
             msgLookUp.put(message.mId, message.timestamp);
+            new MessageClassifier(message).start();
         }
     }
 }
