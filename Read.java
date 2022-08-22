@@ -21,6 +21,8 @@ class Read extends Thread {
 		try{
 			while(true){
 				String msg = in.readLine();
+				
+				if (msg == null) continue;
 				if(msg.equals("close")){
 					System.out.println("["+ip+"] has closed the connection");
 					
@@ -28,10 +30,11 @@ class Read extends Thread {
 				}
 				Message message = new Message(msg);
 				MessageHandler.addToMessagepool(message);
-				System.out.println("Testing2");
+				
 			}
 		}catch(Exception e){
 			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 }

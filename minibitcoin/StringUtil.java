@@ -1,6 +1,7 @@
 package minibitcoin;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -118,4 +119,26 @@ public class StringUtil {
 		String merkleRoot = (treeLayer.size() == 1) ? treeLayer.get(0) : "";
 		return merkleRoot;
 	}
+
+	
+	public static PrivateKey getPrivateKeyFromString (String part){
+    // System.out.println(part);
+    byte[] privateBytes;
+    try{
+        privateBytes = Base64.getDecoder().decode((part.getBytes()));
+    } catch (Exception e){
+        return null;
+    }
+    PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateBytes);
+    KeyFactory keyFactory;
+    PrivateKey reciepient = null;
+    try {
+        keyFactory = KeyFactory.getInstance("EC");
+        reciepient = keyFactory.generatePrivate(keySpec);
+        
+    } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+        System.out.println(e);
+    }
+    return reciepient;
+}
 }

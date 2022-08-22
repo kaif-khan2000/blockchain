@@ -36,6 +36,22 @@ class MessageClassifier extends Thread{
             return;
         }
 
+        if (message.mType == 2) {
+            // we have received a transaction
+            System.out.println("type 2:"+message.data);
+            Transaction transaction = new Transaction(message.data);
+            System.out.println("transaction:"+transaction.toString());
+            Server.broadcast(message);
+            // if (transaction.validateTransaction()){
+            //     System.out.println("Transaction is valid");
+            //     //Server.addToMempool(transaction);
+            // }
+            // else{
+            //     System.out.println("Transaction is invalid");
+            // }
+            return;
+        }
+
         
     }
 }

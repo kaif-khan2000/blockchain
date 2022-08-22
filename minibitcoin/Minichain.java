@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.security.Security;
 import com.google.gson.GsonBuilder;
 
+import Wallet;
+
 public class Minichain {
 
     public static ArrayList<Block> blockchain = new ArrayList<Block>();
