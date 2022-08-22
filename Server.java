@@ -41,7 +41,9 @@ public class Server extends Thread {
 
     public static void connectToServer(String ip1) {
         
-        System.out.println(ip1);
+        if(ip1.equals(Message.tempIp)){
+            return;
+        }
         if (ip1.equals("")) {
             System.out.println("IP field is empty.");
             return;
@@ -64,7 +66,7 @@ public class Server extends Thread {
     public static void disconnectFromServer(String ip1) {
         int index = fetchIndex(ip1);
         if (index == -1) {
-            System.out.println("IP is not connected.");
+            System.out.println("disc:IP is not connected.");
             return;
         }
         try {
@@ -124,6 +126,7 @@ public class Server extends Thread {
         } catch (IOException i) {
             System.out.println(i);
         }
+        System.out.println("sending message to " + ip);
         out.println(message.toString());
     }
 
