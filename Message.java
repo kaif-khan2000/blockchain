@@ -22,7 +22,7 @@ public class Message {
                 while (addrs.hasMoreElements()) {
                     InetAddress addr = addrs.nextElement();
                     String tempIp2 = addr.getHostAddress();
-                    if (tempIp2.contains("192")) {
+                    if (tempIp2.contains("192") || tempIp2.contains("172")) {
                         tempIp = tempIp2;
                         break;
                     }

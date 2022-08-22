@@ -15,6 +15,7 @@ class Read extends Thread {
 			this.in = new BufferedReader(new InputStreamReader(server.getInputStream()));
 		}catch(IOException i){
 			System.out.println(i);
+			//i.printStackTrace();
 		}
 	}
 	public void run(){
