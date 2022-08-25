@@ -21,7 +21,7 @@ public class Server extends Thread {
                 servers[i] = null;
             }
         } catch (IOException e) {
-            System.out.println("UserError: " + e);
+            e.printStackTrace();
         }
     }
 
@@ -77,7 +77,7 @@ public class Server extends Thread {
             ip[n + index] = null;
             System.out.println("Disconnected from " + ip1);
         } catch (IOException e) {
-            System.out.println("UserError: " + e);
+            e.printStackTrace();
         }
     }
 
@@ -98,7 +98,7 @@ public class Server extends Thread {
                         return i;
                     }
                 } catch (NullPointerException e) {
-                    System.out.println("NullPointerException: " + e);
+                    e.printStackTrace();
                 }
                 
             }
@@ -123,11 +123,11 @@ public class Server extends Thread {
                 try{
                     out = new PrintWriter(servers[index - n].server1.getOutputStream(), true);
                 } catch (NullPointerException e) {
-                    System.out.println("NullPointerException: " + e);
+                    e.printStackTrace();
                 }
             }
         } catch (IOException i) {
-            System.out.println(i);
+            i.printStackTrace();
         }
         System.out.println("\nsending message to " + ip);
         out.println(message.toString());
@@ -149,11 +149,11 @@ public class Server extends Thread {
                 try{
                     out = new PrintWriter(servers[index - n].server1.getOutputStream(), true);
                 } catch (NullPointerException e) {
-                    System.out.println("NullPointerException: " + e);
+                    e.printStackTrace();
                 }
             }
         } catch (IOException i) {
-            System.out.println(i);
+            i.printStackTrace();
         }
         System.out.println("\nsending message to " + ip);
         out.println(message);
@@ -191,9 +191,9 @@ public class Server extends Thread {
                 ip[index] = "";
             }
         } catch (IOException i) {
-            System.out.println("UserError:" + i);
+            i.printStackTrace();
         } catch (Exception e) {
-            System.out.println("UserError:" + e);
+            e.printStackTrace();
         }
 
     }
@@ -212,10 +212,10 @@ public class Server extends Thread {
             servers[index - n] = null;
 
         } catch (IOException i) {
-            System.out.println("UserError:" + i);
+            i.printStackTrace();
             ip[index] = "";
         } catch (Exception e) {
-            System.out.println("UserError:" + e);
+            e.printStackTrace();
         }
     }
 
@@ -247,7 +247,6 @@ public class Server extends Thread {
                 sendMessage(seed, message);
             }
         } catch (Exception e) {
-            System.out.println("UserError1:" + e);
             e.printStackTrace();
         }
         
