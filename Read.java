@@ -7,7 +7,9 @@ class Read extends Thread {
 	private BufferedReader in = null;
 	private Socket user;
 	public String ip;
-	public Read(Socket server) {
+	private int index;
+	public Read(Socket server,int index) {
+		this.index = index;
 		this.user = server;
 		this.ip = server.getInetAddress().toString().replace("/","");
 		System.out.println("Reading object initializing");
@@ -26,8 +28,12 @@ class Read extends Thread {
 				if (msg == null) continue;
 				if(msg.equals("close")){
 					System.out.println("["+ip+"] has closed the connection");
-					
 					break;
+				}
+				if (msg.equals("connected")) {
+					Server.ip[index] = ip;
+					System.out.println("["+ip+"]"+" Connection was successfull");
+					continue;
 				}
 				Message message = new Message(msg);
 				MessageHandler.addToMessagepool(message);

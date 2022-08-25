@@ -1,14 +1,11 @@
 import java.sql.*;
 import minibitcoin.*;
 import java.security.*;
-import java.security.spec.*;
 import java.security.spec.ECGenParameterSpec;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.awt.*;
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
 import javax.swing.*;
 
 public class Wallet extends Thread {
@@ -77,8 +74,7 @@ public class Wallet extends Thread {
     public void generateKeyPair() {
         try {
             Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-            db obj = new db();
-            Connection conn = obj.con;
+            Connection conn = db.con;
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery("select * from wallet");
             if (!rs.isBeforeFirst()) {
@@ -140,7 +136,7 @@ public class Wallet extends Thread {
         generateKeyPair();
         JFrame f = new JFrame("Wallet");
 
-        JPanel sendBox = new JPanel();
+        
 
         JButton send = new JButton("Send");
 
@@ -175,8 +171,8 @@ public class Wallet extends Thread {
         sendLayout.add(amountLayout, BorderLayout.NORTH);
         sendLayout.add(send, BorderLayout.SOUTH);
 
-        sendBox.add(addressLayout, BorderLayout.NORTH);
-        sendBox.add(sendLayout, BorderLayout.SOUTH);
+        // sendBox.add(addressLayout, BorderLayout.NORTH);
+        // sendBox.add(sendLayout, BorderLayout.SOUTH);
 
         // SEND
         send.addActionListener(l -> {
@@ -196,8 +192,9 @@ public class Wallet extends Thread {
         f.setSize(800, 600);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.getContentPane().setLayout(new FlowLayout());
-
-        f.getContentPane().add(sendBox);
+        f.getContentPane().add(addressLayout);
+        f.getContentPane().add(sendLayout);
+        //f.getContentPane().add(sendBox,BorderLayout.NORTH);
 
         f.setVisible(true);
 

@@ -71,6 +71,7 @@ public class Server extends Thread {
         }
         index -= n;
         try {
+            sendMessage(servers[index].server1.getInetAddress().toString().replace("/", ""), "close");
             servers[index].server1.close();
             servers[index] = null;
             ip[n + index] = null;
@@ -134,6 +135,32 @@ public class Server extends Thread {
         
     }
 
+    public static void sendMessage(String ip, String message) {
+        int index = fetchIndex(ip);
+        if (index == -1) {
+            System.out.println("IP is not connected.");
+            return;
+        }
+        PrintWriter out = null;
+        try {
+            if (index < n) {
+                out = new PrintWriter(client[index].client1.getOutputStream(), true);
+            } else {
+                try{
+                    out = new PrintWriter(servers[index - n].server1.getOutputStream(), true);
+                } catch (NullPointerException e) {
+                    System.out.println("NullPointerException: " + e);
+                }
+            }
+        } catch (IOException i) {
+            System.out.println(i);
+        }
+        System.out.println("\nsending message to " + ip);
+        out.println(message);
+        System.out.println("\nmessage sent to " + ip + " "+ message.toString() + "\n");
+        
+    }
+
     public static void broadcast(Message message) {
         for(int i=0;i<2*n;i++){
             if(ip[i]!=null && ip[i]!=""){
@@ -155,11 +182,9 @@ public class Server extends Thread {
                 System.out.println(Thread.currentThread().getName() + " Waiting for client to join");
                 client1 = server.accept();
                 System.out.println("Client joined");
-                ip[index] = client1.getInetAddress().toString().replace("/", "");
-                // PrintWriter out = new PrintWriter(client1.getOutputStream(), true);
-                // out.println("Hello Client");
-                // out.close();
-                Read thread = new Read(client1);
+                String ip1 = client1.getInetAddress().toString().replace("/", "");
+                sendMessage(ip1, "connected");
+                Read thread = new Read(client1,index);
                 thread.start();
                 thread.join();
                 client1.close();
@@ -177,10 +202,9 @@ public class Server extends Thread {
         int index = Integer.parseInt(Thread.currentThread().getName().replace("ClientThread-", ""));
         try {
             index = n + index;
-            System.out.println(Thread.currentThread().getName() + " Waiting for client to join");
             server1 = new Socket(ip[index], port);
             System.out.println("Connected to server " + ip[index]);
-            Read thread = new Read(server1);
+            Read thread = new Read(server1,index);
             thread.start();
             thread.join();
             server1.close();
@@ -219,7 +243,7 @@ public class Server extends Thread {
             if(!Message.tempIp.equals(seed)){
                 System.out.println("\nEstablishing connection with seed " + seed+"\n");
                 connectToServer(seed);
-                Message message = new Message(0,"hello");
+                Message message = new Message(0,"giveMeAddress");
                 sendMessage(seed, message);
             }
         } catch (Exception e) {

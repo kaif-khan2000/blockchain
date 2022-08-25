@@ -28,24 +28,9 @@ class CollectTransactions extends Thread{
 
 public class Main {
     public static void main(String[] args){
-
-
+        
         Message[] messagepool = new Message[10];
-        int messageCount = 0;
-        Transaction[] mempool = new Transaction[10];
-        //CollectTransactions collectTransactions = new CollectTransactions(mempool);
-        
+        int messageCount = 0;        
         Server.build(messagepool,messageCount);
-        // Mining mining = new Mining(mempool);
-        // mining.start();
-        // collectTransactions.start();
-        
-        // try {
-        //     mining.join();
-        //     collectTransactions.join();
-        // } catch (InterruptedException e) {
-        //     e.printStackTrace();
-        // }
-        
     }
 }

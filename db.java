@@ -7,8 +7,7 @@ public class db
 {
 	public static Connection con;
 	public static int a=1;
-	public db()
-	{
+	static {
 		try
 		{
 			// Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -27,5 +26,9 @@ public class db
 		{
 			System.out.println(e);
 		}
+	}
+	public db()
+	{
+		
 	}
 }
