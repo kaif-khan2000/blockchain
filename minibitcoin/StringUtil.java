@@ -83,6 +83,7 @@ public class StringUtil {
 		try{
 			publicBytes = Base64.getDecoder().decode((part.getBytes()));
 		} catch (Exception e){
+			e.printStackTrace();
 			return null;
 		}
 		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
@@ -93,7 +94,7 @@ public class StringUtil {
 			reciepient = keyFactory.generatePublic(keySpec);
 			
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		return reciepient;
 	}
@@ -127,6 +128,7 @@ public class StringUtil {
     try{
         privateBytes = Base64.getDecoder().decode((part.getBytes()));
     } catch (Exception e){
+		e.printStackTrace();
         return null;
     }
     PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateBytes);
@@ -137,8 +139,8 @@ public class StringUtil {
         reciepient = keyFactory.generatePrivate(keySpec);
         
     } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-        System.out.println(e);
-    }
+		e.printStackTrace();
+	}
     return reciepient;
 }
 }

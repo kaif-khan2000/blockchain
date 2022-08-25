@@ -16,8 +16,7 @@ class Read extends Thread {
 		try{
 			this.in = new BufferedReader(new InputStreamReader(server.getInputStream()));
 		}catch(IOException i){
-			System.out.println(i);
-			//i.printStackTrace();
+			i.printStackTrace();
 		}
 	}
 	public void run(){
@@ -40,7 +39,6 @@ class Read extends Thread {
 				
 			}
 		}catch(Exception e){
-			System.out.println(e);
 			e.printStackTrace();
 		}
 	}

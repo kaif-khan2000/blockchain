@@ -24,7 +24,7 @@ public class db
 		}
 		catch(Exception e)
 		{
-			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 	public db()

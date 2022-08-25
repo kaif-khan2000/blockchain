@@ -28,7 +28,7 @@ class MessageClassifier extends Thread{
                 try{
                     Server.connectToServer(ip);
                 } catch (Exception e){
-                    System.out.println("UserError:" + e);
+                    e.printStackTrace();
                 }
             }
             if (ips.length>1)
