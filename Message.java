@@ -10,7 +10,7 @@ public class Message {
     public String data;
 
     private String delim = "@msg";
-    public static String tempIp;
+    public static String tempIp = "";
 
     static {
         try {

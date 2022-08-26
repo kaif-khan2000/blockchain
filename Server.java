@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Server extends Thread {
     public static String seed = "192.168.134.190";
@@ -61,6 +62,7 @@ public class Server extends Thread {
         servers[index] = new Server(false);
         servers[index].setName("ClientThread-" + index);
         servers[index].start();
+        try{TimeUnit.SECONDS.sleep(20);}catch(InterruptedException e){e.printStackTrace();}
     }
     
     public static void disconnectFromServer(String ip1) {
@@ -250,6 +252,7 @@ public class Server extends Thread {
                 connectToServer(seed);
                 Message message = new Message(0,"giveMeAddress");
                 sendMessage(seed, message);
+                //disconnectFromServer(seed);
             }
         } catch (Exception e) {
             e.printStackTrace();
