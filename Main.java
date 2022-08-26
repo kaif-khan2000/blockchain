@@ -32,5 +32,6 @@ public class Main {
         Message[] messagepool = new Message[10];
         int messageCount = 0;        
         Server.build(messagepool,messageCount);
+        
     }
 }

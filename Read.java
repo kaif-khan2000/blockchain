@@ -30,7 +30,6 @@ class Read extends Thread {
 					break;
 				}
 				if (msg.equals("connected")) {
-					Server.ip[index] = ip;
 					System.out.println("["+ip+"]"+" Connection was successfull");
 					continue;
 				}

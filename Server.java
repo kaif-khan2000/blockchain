@@ -112,7 +112,7 @@ public class Server extends Thread {
         }
         int index = fetchIndex(ip);
         if (index == -1) {
-            System.out.println("IP is not connected.");
+            System.out.println("sendMess: IP is not connected.");
             return;
         }
         PrintWriter out = null;
@@ -138,7 +138,7 @@ public class Server extends Thread {
     public static void sendMessage(String ip, String message) {
         int index = fetchIndex(ip);
         if (index == -1) {
-            System.out.println("IP is not connected.");
+            System.out.println("sendMess(string):IP is not connected.");
             return;
         }
         PrintWriter out = null;
@@ -175,15 +175,17 @@ public class Server extends Thread {
     }
 
     public void serverFunction() {
+        int index = -1;
         try {
-            int index = Integer.parseInt(Thread.currentThread().getName().replace("ServerThread-", ""));
+            index = Integer.parseInt(Thread.currentThread().getName().replace("ServerThread-", ""));
             while (true) {
 
                 System.out.println(Thread.currentThread().getName() + " Waiting for client to join");
                 client1 = server.accept();
                 System.out.println("Client joined");
                 String ip1 = client1.getInetAddress().toString().replace("/", "");
-                sendMessage(ip1, "connected");
+				ip[index] = ip1;
+                sendMessage(ip[index], "connected");
                 Read thread = new Read(client1,index);
                 thread.start();
                 thread.join();
@@ -192,6 +194,9 @@ public class Server extends Thread {
             }
         } catch (IOException i) {
             i.printStackTrace();
+            try {client1.close();}
+            catch(Exception e){e.printStackTrace();}
+            ip[index] = "";
         } catch (Exception e) {
             e.printStackTrace();
         }
