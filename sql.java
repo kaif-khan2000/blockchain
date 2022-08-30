@@ -53,6 +53,8 @@ public class sql {
                     "signature varchar(1000)," +
                     "sequence int," +
                     "PRIMARY KEY (id)" +
+                    "block_id varchar(1000)," +
+                    "FOREIGN KEY (block_id) REFERENCES block(hash)" +
                     ");");
 
             rset = stmt.execute("create table tran_input (" +
