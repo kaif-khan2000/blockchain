@@ -39,17 +39,17 @@ public class sql {
             boolean rset = stmt.execute("use bitcoin;");
             rset = stmt.execute("create table wallet (" +
                     "id int NOT NULL AUTO_INCREMENT," +
-                    "privatekey varchar(100)," +
-                    "publickey varchar(100)," +
+                    "privatekey varchar(500)," +
+                    "publickey varchar(500)," +
                     "PRIMARY KEY (id)" +
                     ");");
 
             rset = stmt.execute("create table block (" +
                     "id int NOT NULL AUTO_INCREMENT," +
-                    "hash varchar(100)," +
-                    "prevhash varchar(100)," +
-                    "merkletree varchar(100)," +
-                    "timestamp varchar(100)," +
+                    "hash varchar(500)," +
+                    "prevhash varchar(500)," +
+                    "merkletree varchar(500)," +
+                    "timestamp varchar(500)," +
                     "nonce int," +
                     "PRIMARY KEY (id)," +
                     "UNIQUE (hash)" +
@@ -57,28 +57,28 @@ public class sql {
             
             rset = stmt.execute("create table transaction (" +
                     "id int NOT NULL AUTO_INCREMENT," +
-                    "transaction_id varchar(100)," +
-                    "publickey_sender varchar(100)," +
-                    "publickey_receiver varchar(100)," +
+                    "transaction_id varchar(500)," +
+                    "publickey_sender varchar(500)," +
+                    "publickey_receiver varchar(500)," +
                     "value int," +
-                    "signature varchar(100)," +
+                    "signature varchar(500)," +
                     "sequence int," +
-                    "block_id varchar(100)," +
+                    "block_id varchar(500)," +
                     "PRIMARY KEY (id)," +
                     "FOREIGN KEY (block_id) REFERENCES block(hash)" +
                     ");");
 
             rset = stmt.execute("create table tran_input (" +
-                    "tran_outputid varchar(100)," +
+                    "tran_outputid varchar(500)," +
                     "value int," +
-                    "transaction_id varchar(100)" +
+                    "transaction_id varchar(500)" +
                     ");");
 
             rset = stmt.execute("create table tran_output (" +
                     "id int NOT NULL AUTO_INCREMENT," +
-                    "receiver varchar(100)," +
+                    "receiver varchar(500)," +
                     "value int," +
-                    "transaction_id varchar(100)," +
+                    "transaction_id varchar(500)," +
                     "utxo bool," +
                     "PRIMARY KEY (id)" +
                     ");");
