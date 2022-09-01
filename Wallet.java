@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.awt.*;
 import javax.swing.*;
+import minibitcoin.*;
 
 public class Wallet extends Thread {
     public PrivateKey privateKey;
@@ -129,7 +130,10 @@ public class Wallet extends Thread {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
+        Block b = new Block("0000000000");
+        b.addTransaction(new Transaction(publicKey, publicKey, 50, new ArrayList<TransactionInput>()));
+        b.mineBlock(3);
+        addToBlockchain(b);
     }
 
     public void run() {

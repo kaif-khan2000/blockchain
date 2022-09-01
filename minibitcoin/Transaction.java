@@ -22,6 +22,7 @@ public class Transaction {
         this.value = value;
         this.inputs = inputs;
 		
+		
     }
 
 	public Transaction(String message) {
@@ -49,7 +50,7 @@ public class Transaction {
 	}
 
     //This Calculates the transaction hash (which will be used as its Id)
-    private String calulateHash() {
+    private String calculateHash() {
         sequence++; //increase the sequence to avoid 2 identical transactions having the same hash
         return StringUtil.applySha256(
                 StringUtil.getStringFromKey(sender) +
@@ -90,7 +91,7 @@ public class Transaction {
 		
 		//generate transaction outputs:
 		float leftOver = getInputsValue() - value; //get value of inputs then the left over change:
-		transactionId = calulateHash();
+		transactionId = calculateHash();
 		outputs.add(new TransactionOutput( this.reciepient, value,transactionId)); //send value to recipient
 		outputs.add(new TransactionOutput( this.sender, leftOver,transactionId)); //send the left over 'change' back to sender		
 				
