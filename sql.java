@@ -82,7 +82,7 @@ public class sql {
                     "utxo bool," +
                     "PRIMARY KEY (id)" +
                     ");");
-
+            System.out.println("Database created successfully...");
 
         } catch (SQLException e) {
             // TODO Auto-generated catch block
