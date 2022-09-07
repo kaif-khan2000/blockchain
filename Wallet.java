@@ -10,8 +10,8 @@ import javax.swing.*;
 import minibitcoin.*;
 
 public class Wallet extends Thread {
-    public PrivateKey privateKey;
-    public PublicKey publicKey;
+    public static PrivateKey privateKey;
+    public static PublicKey publicKey;
 
     public HashMap<String, TransactionOutput> UTXOs = new HashMap<String, TransactionOutput>();
 
@@ -113,13 +113,26 @@ public class Wallet extends Thread {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+                    //create a genesis block
                     Block genesisBlock = new Block("0");
                     genesisBlock.timestamp = 1662529884211L;
                     genesisBlock.mineBlock(3);
                     System.out.println(genesisBlock.hash);
                     sql.storeblock(genesisBlock);
+
+                    // //seed node creating a block with 100 coins
+                    // Block block = new Block(genesisBlock.hash);
+                    // Transaction t = new Transaction(publicKey, publicKey, 100, null);
+                    // ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
+                    // outputs.add(new TransactionOutput(t.reciepient, t.value, t.transactionId));
+                    // t.outputs = outputs;
+
+                    // t.generateSignature(privateKey);
+                    // block.addTransaction(t);
+                    // block.mineBlock(3);
+                    // sql.storeblock(block);
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             } else {
                 // keys in database
@@ -142,7 +155,7 @@ public class Wallet extends Thread {
         JFrame f = new JFrame("Wallet");
 
         JButton send = new JButton("Send");
-
+        JLabel balance = new JLabel("Balance: "+sql.fetchBalance());
         JPanel addressLayout = new JPanel();
         addressLayout.setLayout(new BorderLayout());
         JPanel myAddressLayout = new JPanel();
@@ -179,8 +192,13 @@ public class Wallet extends Thread {
 
         // SEND
         send.addActionListener(l -> {
+            System.out.println("Updating balance");
+            balance.setText("Balance: "+sql.fetchBalance());
             String from = myAddress.getText();
             String toAddress = to.getText();
+            if (toAddress.equals("")){
+                return;
+            }
             float amountToSend = Float.parseFloat(amount.getText());
             ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
             inputs.add(new TransactionInput(from));
@@ -189,6 +207,7 @@ public class Wallet extends Thread {
             Transaction tr = new Transaction(fromkey, tokey, amountToSend, inputs);
             tr.generateSignature(privateKey);
             Server.broadcast(new Message(2, tr.toString()));
+
         });
 
         // setup GUI
@@ -197,6 +216,7 @@ public class Wallet extends Thread {
         f.getContentPane().setLayout(new FlowLayout());
         f.getContentPane().add(addressLayout);
         f.getContentPane().add(sendLayout);
+        f.getContentPane().add(balance);
         // f.getContentPane().add(sendBox,BorderLayout.NORTH);
 
         f.setVisible(true);

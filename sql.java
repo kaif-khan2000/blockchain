@@ -27,10 +27,11 @@ public class sql {
             }
             for (Transaction transaction : newBlock.transactions) {
                 rs = st.executeUpdate(
-                        "insert into transaction(publickey_sender,publickey_receiver,value,signature,block_id) values "
+                        "insert into transaction(transaction_id, publickey_sender,publickey_receiver,value,signature,block_id) values "
                                 +
                                 // add transaction id here
-                                "('" + StringUtil.getStringFromKey(transaction.sender) +
+                                "('" + transaction.transactionId +
+                                "','" + StringUtil.getStringFromKey(transaction.sender) +
                                 "','" + StringUtil.getStringFromKey(transaction.reciepient) +
                                 "','" + transaction.value +
                                 "','" + transaction.signature.toString() +
@@ -44,7 +45,7 @@ public class sql {
                 }
                 for (TransactionOutput output : transaction.outputs) {
                     rs = st.executeUpdate("insert into tran_output(transaction_id, address, value, utxo) values " +
-                            "('" + transaction.transactionId.toString() +
+                            "('" + transaction.transactionId +
                             "','" + StringUtil.getStringFromKey(output.reciepient) +
                             "','" + output.value +
                             "'," + "1" + "" +
@@ -55,6 +56,21 @@ public class sql {
             e.printStackTrace();
         }
 
+    }
+
+    public static float fetchBalance(){
+        try {
+            Connection conn = db.con;
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("select sum(value) from tran_output where address = '"
+                    + StringUtil.getStringFromKey(Wallet.publicKey) + "' and utxo = 1;");
+            while (rs.next()) {
+                return rs.getFloat(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public static ArrayList<Transaction> fetchUTXO(int amount, String address) {

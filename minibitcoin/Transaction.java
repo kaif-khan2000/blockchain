@@ -77,7 +77,11 @@ public class Transaction {
 			System.out.println("#Transaction Signature failed to verify");
 			return false;
 		}
-				
+		// donot use the below code, And comment it.	
+		// if(inputs == null) {
+		// 	transactionId = calculateHash();
+		// 	return true;
+		// }
 		//gather transaction inputs (Make sure they are unspent):
 		for(TransactionInput i : inputs) {
 			i.UTXO = Minichain.UTXOs.get(i.transactionOutputId);
