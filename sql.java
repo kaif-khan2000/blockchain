@@ -22,54 +22,77 @@ public class sql {
             else
                 System.out.println("Insert Failed");
 
-            for (Transaction transaction: newBlock.transactions){
-                rs = st.executeUpdate("insert into transaction(publickey_sender,publickey_receiver,value,signature,block_id) values "+
-                //add transaction id here        
-                "('"+transaction.sender+
-                        "','"+transaction.reciepient+
-                        "','"+transaction.value+
-                        "','"+transaction.signature.toString()+
-                        "','"+newBlock.hash+"');"
-                );
-                for (TransactionInput input: transaction.inputs){
-                    rs = st.executeUpdate("insert into tran_input(transaction_id,transaction_output_id) values "+
-                        "('"+transaction.transactionId.toString()+
-                    );
-                }             
+            if(newBlock.prevHash.equals("0")){
+                return;
+            }
+            for (Transaction transaction : newBlock.transactions) {
+                rs = st.executeUpdate(
+                        "insert into transaction(publickey_sender,publickey_receiver,value,signature,block_id) values "
+                                +
+                                // add transaction id here
+                                "('" + StringUtil.getStringFromKey(transaction.sender) +
+                                "','" + StringUtil.getStringFromKey(transaction.reciepient) +
+                                "','" + transaction.value +
+                                "','" + transaction.signature.toString() +
+                                "','" + newBlock.hash + "');");
+                if (transaction.inputs != null) {
+                    for (TransactionInput input : transaction.inputs) {
+                        rs = st.executeUpdate("insert into tran_input(transaction_id,transaction_output_id) values " +
+                                "('" + transaction.transactionId.toString() +
+                                "','" + input.transactionOutputId.toString() + "');");
+                    }
+                }
+                for (TransactionOutput output : transaction.outputs) {
+                    rs = st.executeUpdate("insert into tran_output(transaction_id, address, value, utxo) values " +
+                            "('" + transaction.transactionId.toString() +
+                            "','" + StringUtil.getStringFromKey(output.reciepient) +
+                            "','" + output.value +
+                            "'," + "1" + "" +
+                            ");");
+                }
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
     }
 
-    ArrayList<Transaction> fetchUTXO(int amount,String address){
+    public static ArrayList<Transaction> fetchUTXO(int amount, String address) {
         ArrayList<Transaction> utxo = new ArrayList<Transaction>();
         try {
             Connection conn = db.con;
             Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("select * from tran_output as o,transaction as p where t.transaction_id = o.transaction_id and address='"+address+"'");
-            while(rs.next()){
+            ResultSet rs = st.executeQuery(
+                    "select * from tran_output as o,transaction as p where t.transaction_id = o.transaction_id and address='"
+                            + address + "' and utxo=1;");
+            while (rs.next()) {
                 Transaction transaction = new Transaction(new String("demo"));
                 utxo.add(transaction);
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return utxo;
     }
 
-    
+    public static void dropDatabase() {
+        Connection stmt = db.con;
+        try {
+            stmt.createStatement().execute("drop database if exists bitcoin");
+            stmt.createStatement().execute("create database bitcoin");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
+        dropDatabase();
         db obj = new db();
         Connection conn = obj.con;
         try {
             Statement stmt = conn.createStatement();
-            // boolean rset = stmt.execute("CREATE DATABASE bitcoin;");//Query
-            boolean rset = stmt.execute("use bitcoin;");
+            boolean rset;
+            stmt.execute("use bitcoin;");
             rset = stmt.execute("create table wallet (" +
                     "id int NOT NULL AUTO_INCREMENT," +
                     "privatekey varchar(500)," +
@@ -87,7 +110,7 @@ public class sql {
                     "PRIMARY KEY (id)," +
                     "UNIQUE (hash)" +
                     ");");
-            
+
             rset = stmt.execute("create table transaction (" +
                     "id int NOT NULL AUTO_INCREMENT," +
                     "transaction_id varchar(500)," +
@@ -98,32 +121,30 @@ public class sql {
                     "sequence int," +
                     "block_id varchar(500)," +
                     "PRIMARY KEY (id)," +
-                    "UNIQUE(transaction_id),"+
-                    "FOREIGN KEY (block_id) REFERENCES block(hash) DELETE ON CASCADE" +
+                    "UNIQUE(transaction_id)," +
+                    "FOREIGN KEY (block_id) REFERENCES block(hash)" +
                     ");");
 
             rset = stmt.execute("create table tran_input (" +
                     "tran_outputid varchar(500)," +
                     "transaction_id varchar(500)," +
-                    "FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id) DELETE ON CASCASDE" +
+                    "FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id)" +
                     ");");
 
             rset = stmt.execute("create table tran_output (" +
                     "id int NOT NULL AUTO_INCREMENT," +
                     "transaction_id varchar(500)," +
+                    "address varchar(500)," +
+                    "value int," +
                     "utxo bool," +
                     "PRIMARY KEY (id)," +
-                    "FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id) DELETE ON CASCADE" +
+                    "FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id)" +
                     ");");
             System.out.println("Database created successfully...");
 
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        // if (obj.con != null)
-        // System.out.println("Connected");
-        // else
-        // System.out.println("Not Connected");
+        
     }
 }

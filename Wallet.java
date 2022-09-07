@@ -113,7 +113,11 @@ public class Wallet extends Thread {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-
+                    Block genesisBlock = new Block("0");
+                    genesisBlock.timestamp = 1662529884211L;
+                    genesisBlock.mineBlock(3);
+                    System.out.println(genesisBlock.hash);
+                    sql.storeblock(genesisBlock);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -127,20 +131,15 @@ public class Wallet extends Thread {
 
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        Block b = new Block("0000000000");
-        b.addTransaction(new Transaction(publicKey, publicKey, 50, new ArrayList<TransactionInput>()));
-        b.mineBlock(3);
-        addToBlockchain(b);
+
     }
 
     public void run() {
         generateKeyPair();
-        JFrame f = new JFrame("Wallet");
 
-        
+        JFrame f = new JFrame("Wallet");
 
         JButton send = new JButton("Send");
 
@@ -198,7 +197,7 @@ public class Wallet extends Thread {
         f.getContentPane().setLayout(new FlowLayout());
         f.getContentPane().add(addressLayout);
         f.getContentPane().add(sendLayout);
-        //f.getContentPane().add(sendBox,BorderLayout.NORTH);
+        // f.getContentPane().add(sendBox,BorderLayout.NORTH);
 
         f.setVisible(true);
 

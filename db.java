@@ -14,14 +14,14 @@ public class db
 			// Class.forName("oracle.jdbc.driver.OracleDriver");
 			
 			// Establishing Connection
-			Scanner sc = new Scanner(System.in);
-			System.out.print("Enter the username of mysql: ");
-			String name = sc.nextLine();
-			System.out.print("Enter the password of mysql: ");
-			String pass = sc.nextLine();
+			// Scanner sc = new Scanner(System.in);
+			// System.out.print("Enter the username of mysql: ");
+			// String name = sc.nextLine();
+			// System.out.print("Enter the password of mysql: ");
+			// String pass = sc.nextLine();
 
 			
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bitcoin",name,pass);
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bitcoin","kaif","ali@6666");
 
 			// if (con != null)			
 			// 	System.out.println("Connected");		
@@ -29,7 +29,7 @@ public class db
 			// 	System.out.println("Not Connected");
 			
 			// con.close();
-			sc.close();
+			// sc.close();
 		}
 		catch(Exception e)
 		{

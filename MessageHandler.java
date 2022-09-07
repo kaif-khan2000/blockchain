@@ -44,7 +44,7 @@ class MessageClassifier extends Thread{
             //Server.broadcast(message);
             if (transaction.processTransaction()){
                 System.out.println("Transaction is valid");
-                //Server.addToMempool(transaction);
+            
             }
             else{
                 System.out.println("Transaction is invalid");
