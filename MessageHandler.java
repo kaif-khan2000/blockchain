@@ -1,12 +1,16 @@
 import java.util.HashMap;
 
 import minibitcoin.*;
+
+import java.net.Socket;
 import java.util.*;
 
 class MessageClassifier extends Thread{
     private Message message;
-    public MessageClassifier(Message message){
+    private Socket client;
+    public MessageClassifier(Message message, Socket client){
         this.message = message;
+        this.client = client;
     }
 
     public void run() {
@@ -16,7 +20,7 @@ class MessageClassifier extends Thread{
             String ips = Server.getIps();
             Message newMessage = new Message(1,ips);
             System.out.println("messageSent:"+newMessage.toString());
-            Server.sendMessage(message.ip, newMessage);
+            Server.sendMessage(client.getInetAddress().toString(), newMessage);
             return;
         }
 
@@ -24,9 +28,12 @@ class MessageClassifier extends Thread{
             // we have received ip addresses
             System.out.println("type 1:"+message.data);
             String[] ips = message.data.split(",");
+            int count = 0;
             for (String ip :ips){
                 try{
                     Server.connectToServer(ip);
+                    count++;
+                    if(count > 2) break;
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -51,8 +58,10 @@ class MessageClassifier extends Thread{
             }
             return;
         }
-
         
+        if(message.mType == 3) {
+            String hash = message.data;
+        }
     }
 }
 
@@ -71,7 +80,7 @@ public class MessageHandler {
 
     public static HashMap<String, Long> msgLookUp = new HashMap<String, Long>();
 
-    public static void addToMessagepool(Message message) {
+    public static void addToMessagepool(Message message, Socket client) {
         long currentTime = new Date().getTime();
         // message of 2 minutes old.
         if (currentTime - message.timestamp > 120000) {
@@ -82,7 +91,7 @@ public class MessageHandler {
             messagepool[messageCount] = message;
             messageCount++;
             msgLookUp.put(message.mId, message.timestamp);
-            MessageClassifier m = new MessageClassifier(message);
+            MessageClassifier m = new MessageClassifier(message, client);
             m.start();
             
         }

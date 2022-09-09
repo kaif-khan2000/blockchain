@@ -34,7 +34,7 @@ class Read extends Thread {
 					continue;
 				}
 				Message message = new Message(msg);
-				MessageHandler.addToMessagepool(message);
+				MessageHandler.addToMessagepool(message,user);
 				
 			}
 		}catch(Exception e){

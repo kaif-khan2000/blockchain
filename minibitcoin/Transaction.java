@@ -14,9 +14,11 @@ public class Transaction {
     public ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
 
     private static int sequence = 0; // a rough count of how many transactions have been generated. 
-	private String delim = " & ";
+	public static String delim = " & ";
     // Constructor: 
-    public Transaction(PublicKey from, PublicKey to, float value,  ArrayList<TransactionInput> inputs) {
+	public Transaction() {}
+
+	public Transaction(PublicKey from, PublicKey to, float value,  ArrayList<TransactionInput> inputs) {
         this.sender = from;
         this.reciepient = to;
         this.value = value;

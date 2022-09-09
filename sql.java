@@ -5,6 +5,83 @@ import java.util.ArrayList;
 import minibitcoin.*;
 
 public class sql {
+    public static ArrayList<TransactionInput> fetchInputs(String t_id){
+        ArrayList<TransactionInput> inputs = null;
+        //write code here
+        return inputs;
+    }
+    public static ArrayList<TransactionOutput> fetchOutputs(String t_id){
+        ArrayList<TransactionOutput> outputs = null;
+        //write code here
+        return outputs;
+    } 
+    public static ArrayList<Transaction> fetchTransactions(String block_id) {
+        ArrayList<Transaction> transactions = null;
+        try {
+            Statement st = db.con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM transaction where block_id = '" + block_id + "';");
+            String result = "";
+            while (rs.next()) {
+                String transaction_id = rs.getString("transaction_id");
+                String senderPk = rs.getString("publickey_sender");
+                String receiverPk = rs.getString("publickey_receiver");
+                String value = rs.getString("value");
+                String signature = rs.getString("signature");
+                Transaction tr = new Transaction();
+                tr.sender = StringUtil.getPublicKeyFromString(senderPk);
+                tr.reciepient = StringUtil.getPublicKeyFromString(receiverPk);
+                tr.signature = signature.getBytes();
+                tr.value = Float.parseFloat(value);
+                tr.transactionId = transaction_id;
+                
+                tr.inputs = fetchInputs(transaction_id);
+                tr.outputs = fetchOutputs(transaction_id);
+
+                transactions.add(tr);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transactions;
+    }
+
+    public static Block createBlock(String hash) {
+        Block block = null;
+        String delim = "@block";
+        try {
+            Statement st = db.con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM blocks WHERE hash = '" + hash + "';");
+            String result = "";
+            if (rs.next()) {
+                hash = rs.getString("hash");
+                String prevHash = rs.getString("prevHash");
+                String merkleRoot = rs.getString("merkleRoot");
+                long timestamp = rs.getLong("timestamp");
+                int nonce = rs.getInt("nonce");
+                result = hash + delim + prevHash + delim + merkleRoot + delim + Long.toString(timestamp) + delim
+                        + Integer.toString(nonce);
+            }
+
+            block = new Block(result, 0);
+            block.transactions = fetchTransactions(hash);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return block;
+    }
+
+    public static String getLastHash() {
+        try {
+            Statement st = db.con.createStatement();
+            ResultSet rs = st.executeQuery("select hash from lasthash order by id desc limit 1");
+            while (rs.next()) {
+                return rs.getString("hash");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
     public static void storeblock(Block newBlock) {
         try {
@@ -17,12 +94,15 @@ public class sql {
                     + String.valueOf(newBlock.timestamp) + "','"
                     + String.valueOf(newBlock.nonce) + "');");
 
+            // update the lasthash table with the hash at id = 1
+            rs = st.executeUpdate("update lasthash set hash = '" + newBlock.hash + "' where id = 1;");
+
             if (rs > 0)
                 System.out.println("Successfully Inserted");
             else
                 System.out.println("Insert Failed");
 
-            if(newBlock.prevHash.equals("0")){
+            if (newBlock.prevHash.equals("0")) {
                 return;
             }
             for (Transaction transaction : newBlock.transactions) {
@@ -58,7 +138,7 @@ public class sql {
 
     }
 
-    public static float fetchBalance(){
+    public static float fetchBalance() {
         try {
             Connection conn = db.con;
             Statement st = conn.createStatement();
@@ -109,6 +189,8 @@ public class sql {
             Statement stmt = conn.createStatement();
             boolean rset;
             stmt.execute("use bitcoin;");
+            rset = stmt.execute("create table lasthash(id int not null auto_increment,hash varchar(64));");
+            rset = stmt.execute("insetr into lasthash values('0');");
             rset = stmt.execute("create table wallet (" +
                     "id int NOT NULL AUTO_INCREMENT," +
                     "privatekey varchar(500)," +
@@ -161,6 +243,6 @@ public class sql {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
+
     }
 }

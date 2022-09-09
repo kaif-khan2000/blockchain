@@ -234,6 +234,11 @@ public class Server extends Thread {
         }
     }
 
+    public static void fetchRemainingBlocks() {
+        String hash = sql.getLastHash();
+        Message message = new Message(3, hash);
+        sendMessage(seed, message);
+    }
     public static void build(Message[] messagepool1, int messageCount) {
         
         String[] ip = {"192.168.134.152"};
@@ -250,9 +255,12 @@ public class Server extends Thread {
             if(!Message.tempIp.equals(seed)){
                 System.out.println("\nEstablishing connection with seed " + seed+"\n");
                 connectToServer(seed);
+                fetchRemainingBlocks();       
                 Message message = new Message(0,"giveMeAddress");
                 sendMessage(seed, message);
                 //disconnectFromServer(seed);
+
+
             }
         } catch (Exception e) {
             e.printStackTrace();
