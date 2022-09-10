@@ -29,44 +29,48 @@ public class Server extends Thread {
     public static int mCount;
     public static String ip[] = new String[100];
     
-    public static String getIps() {
+    public static String getIps(Socket user) {
         String ips = "";
+        String userIp = user.getInetAddress().toString().replace("/", "");
         for (int i = 0; i < 2*n; i++) {
             try{
                 String ip1 = servers[i].client1.getInetAddress().toString().replace("/", ""); 
-                ips += ip1 + ",";
+                if(!ip1.equals(userIp))
+                    ips += ip1 + ",";
             } catch (Exception e){}
             try {
                 String ip1 = client[i].client1.getInetAddress().toString().replace("/", ""); 
-                ips += ip1 + ",";
+                if(!ip1.equals(userIp))
+                    ips += ip1 + ",";
             } catch (Exception e){}
         }
         return ips;
     }
 
-    public static void connectToServer(String ip1) {
+    public static Socket connectToServer(String ip1) {
         
         if(ip1.equals(Message.tempIp)){
-            return;
+            return null;
         }
         if (ip1.equals("")) {
             System.out.println("IP field is empty.");
-            return;
+            return null;
         }
         if (fetchIndex(ip1) != -1) {
             System.out.println("IP is already connected.");
-            return;
+            return null;
         }
         int index = fetchNullIndex();
         if (index == -1) {
             System.out.println("No space left to connect.");
-            return;
+            return null;
         }
         ip[n + index] = ip1;
         servers[index] = new Server(false);
         servers[index].setName("ClientThread-" + index);
         servers[index].start();
         try{TimeUnit.SECONDS.sleep(5);}catch(InterruptedException e){e.printStackTrace();}
+        return servers[index].client1;
     }
     
     public static void disconnectFromServer(String ip1) {
@@ -112,34 +116,34 @@ public class Server extends Thread {
         return -1;
     }
 
-    public static void sendMessage(String ip, Message message) {
-        if(ip.equals(Message.tempIp)){
-            return;
-        }
-        int index = fetchIndex(ip);
-        if (index == -1) {
-            System.out.println("sendMess: IP is not connected.");
-            return;
-        }
-        PrintWriter out = null;
-        try {
-            if (index < n) {
-                out = new PrintWriter(client[index].client1.getOutputStream(), true);
-            } else {
-                try{
-                    out = new PrintWriter(servers[index - n].server1.getOutputStream(), true);
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (IOException i) {
-            i.printStackTrace();
-        }
-        System.out.println("\nsending message to " + ip);
-        out.println(message.toString());
-        System.out.println("\nmessage sent to " + ip + " "+ message.toString() + "\n");
+    // public static void sendMessage(String ip, Message message) {
+    //     if(ip.equals(Message.tempIp)){
+    //         return;
+    //     }
+    //     int index = fetchIndex(ip);
+    //     if (index == -1) {
+    //         System.out.println("sendMess: IP is not connected.");
+    //         return;
+    //     }
+    //     PrintWriter out = null;
+    //     try {
+    //         if (index < n) {
+    //             out = new PrintWriter(client[index].client1.getOutputStream(), true);
+    //         } else {
+    //             try{
+    //                 out = new PrintWriter(servers[index - n].server1.getOutputStream(), true);
+    //             } catch (NullPointerException e) {
+    //                 e.printStackTrace();
+    //             }
+    //         }
+    //     } catch (IOException i) {
+    //         i.printStackTrace();
+    //     }
+    //     System.out.println("\nsending message to " + ip);
+    //     out.println(message.toString());
+    //     System.out.println("\nmessage sent to " + ip + " "+ message.toString() + "\n");
         
-    }
+    // }
 
     public static void sendMessage(String ip, String message) {
         int index = fetchIndex(ip);
@@ -178,13 +182,26 @@ public class Server extends Thread {
         out.println(message);
         System.out.println("\nmessage sent to " + client.getInetAddress().toString() + " "+ message.toString() + "\n");
     }
+    // public static void broadcast(Message message) {
+    //     for(int i=0;i<2*n;i++){
+    //         if(ip[i]!=null && ip[i]!=""){
+    //             sendMessage(ip[i], message);
+    //         }
+    //     }
+    // }
+
     public static void broadcast(Message message) {
-        for(int i=0;i<2*n;i++){
-            if(ip[i]!=null && ip[i]!=""){
-                sendMessage(ip[i], message);
-            }
+        for(int i=0;i<n;i++){
+            try {
+                sendMessage(servers[i].client1, message);
+            } catch (Exception e) {}
+
+            try {
+                sendMessage(client[i].client1, message);
+            } catch (Exception e) {}
         }
     }
+    
 
     public Server(boolean isServer) {
         this.isServer = isServer;
@@ -249,7 +266,7 @@ public class Server extends Thread {
         }
     }
 
-    public static void fetchRemainingBlocks() {
+    public static void fetchRemainingBlocks(Socket seed) {
         String hash = sql.getLastHash();
         Message message = new Message(3, hash);
         sendMessage(seed, message);
@@ -269,10 +286,10 @@ public class Server extends Thread {
             //System.out.println(Message.tempIp);
             if(!Message.tempIp.equals(seed)){
                 System.out.println("\nEstablishing connection with seed " + seed+"\n");
-                connectToServer(seed);
-                fetchRemainingBlocks();       
+                Socket seedSock = connectToServer(seed);
+                fetchRemainingBlocks(seedSock);       
                 Message message = new Message(0,"giveMeAddress");
-                sendMessage(seed, message);
+                sendMessage(seedSock, message);
                 while(MessageClassifier.fetchedIps == 0 || MessageClassifier.fetchedRemainingBlocks == 0);
                 if(MessageClassifier.fetchedIps == 1)
                     disconnectFromServer(seed);
