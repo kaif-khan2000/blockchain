@@ -11,10 +11,10 @@ public class TransactionInput {
 		this.transactionOutputId = transactionOutputId;
 	}
 
-	public TransactionInput(String transactionInput, int val) {
+	public TransactionInput(String transactionInput, float val,TransactionOutput UTXO) {
 		String[] parts = transactionInput.split(delim);
 		this.transactionOutputId = parts[0];
-		this.UTXO = new TransactionOutput(parts[1]);
+		this.UTXO = UTXO;
 	}
 
 	public String toString() {

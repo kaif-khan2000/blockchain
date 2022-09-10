@@ -21,7 +21,7 @@ public class db
 			// String pass = sc.nextLine();
 
 			
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bitcoin","kaif","ali@6666");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bitcoin","ravi","password");
 
 			// if (con != null)			
 			// 	System.out.println("Connected");		

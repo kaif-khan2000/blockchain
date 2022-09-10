@@ -1,4 +1,5 @@
 
+import java.security.PublicKey;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -6,13 +7,46 @@ import minibitcoin.*;
 
 public class sql {
     public static ArrayList<TransactionInput> fetchInputs(String t_id){
-        ArrayList<TransactionInput> inputs = null;
+        ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
         //write code here
+        try {
+            Statement st = db.con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM tran_input where transaction_id = '" + t_id + "';");
+            while (rs.next()) {
+                String tran_output = rs.getString("tran_outputid");//TransactionInput table have reference to transactionoutput table
+                //Searching for tranoutput_id in tran_output table to UTXO which is TransactionOutput object
+                ResultSet rsin = st.executeQuery("SELECT * FROM tran_output where tran_outputid = '" + tran_output + "';");
+                if(rsin.next()) {
+                    PublicKey address = StringUtil.getPublicKeyFromString(rsin.getString("address"));
+                    Float value = Float.parseFloat(rsin.getString("value"));
+                    String transaction_id = rsin.getString("transaction_id");
+                    TransactionOutput to = new TransactionOutput(address, value, transaction_id);
+                    TransactionInput tr = new TransactionInput(tran_output,value,to);
+                    inputs.add(tr);
+                }
+                
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return inputs;
     }
     public static ArrayList<TransactionOutput> fetchOutputs(String t_id){
-        ArrayList<TransactionOutput> outputs = null;
+        ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
         //write code here
+        try {
+            Statement st = db.con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM tran_output where transaction_id = '" + t_id + "';");
+            while (rs.next()) {
+                PublicKey address = StringUtil.getPublicKeyFromString(rs.getString("address"));
+                Float value = Float.parseFloat(rs.getString("value"));
+                String transaction_id = rs.getString("transaction_id");
+                TransactionOutput to = new TransactionOutput(address, value, transaction_id);
+                outputs.add(to);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return outputs;
     } 
     public static ArrayList<Transaction> fetchTransactions(String block_id) {
@@ -124,8 +158,9 @@ public class sql {
                     }
                 }
                 for (TransactionOutput output : transaction.outputs) {
-                    rs = st.executeUpdate("insert into tran_output(transaction_id, address, value, utxo) values " +
-                            "('" + transaction.transactionId +
+                    rs = st.executeUpdate("insert into tran_output(tranoutput_id,transaction_id, address, value, utxo) values " +
+                            "('" + output.id +
+                            "','" + transaction.transactionId +
                             "','" + StringUtil.getStringFromKey(output.reciepient) +
                             "','" + output.value +
                             "'," + "1" + "" +
@@ -189,8 +224,8 @@ public class sql {
             Statement stmt = conn.createStatement();
             boolean rset;
             stmt.execute("use bitcoin;");
-            rset = stmt.execute("create table lasthash(id int not null auto_increment,hash varchar(64));");
-            rset = stmt.execute("insetr into lasthash values('0');");
+            rset = stmt.execute("create table lasthash(id int not null auto_increment,hash varchar(64),PRIMARY KEY (id),UNIQUE (hash));");
+            rset = stmt.execute("insert into lasthash(hash) values('0');");
             rset = stmt.execute("create table wallet (" +
                     "id int NOT NULL AUTO_INCREMENT," +
                     "privatekey varchar(500)," +
@@ -231,6 +266,7 @@ public class sql {
 
             rset = stmt.execute("create table tran_output (" +
                     "id int NOT NULL AUTO_INCREMENT," +
+                    "tranoutput_id varchar(500)," +
                     "transaction_id varchar(500)," +
                     "address varchar(500)," +
                     "value int," +
