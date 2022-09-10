@@ -257,7 +257,9 @@ public class Server extends Thread {
                 fetchRemainingBlocks();       
                 Message message = new Message(0,"giveMeAddress");
                 sendMessage(seed, message);
-                //disconnectFromServer(seed);
+                while(MessageClassifier.fetchedIps == 0 && MessageClassifier.fetchedRemainingBlocks == 0);
+                if(MessageClassifier.fetchedIps == 1)
+                    disconnectFromServer(seed);
 
 
             }
