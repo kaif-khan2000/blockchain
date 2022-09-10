@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import minibitcoin.*;
 
 public class sql {
+
     public static ArrayList<TransactionInput> fetchInputs(String t_id){
         ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
         //write code here
@@ -50,11 +51,10 @@ public class sql {
         return outputs;
     } 
     public static ArrayList<Transaction> fetchTransactions(String block_id) {
-        ArrayList<Transaction> transactions = null;
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
         try {
             Statement st = db.con.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM transaction where block_id = '" + block_id + "';");
-            String result = "";
             while (rs.next()) {
                 String transaction_id = rs.getString("transaction_id");
                 String senderPk = rs.getString("publickey_sender");
@@ -80,7 +80,7 @@ public class sql {
     }
 
     public static Block createBlock(String hash) {
-        Block block = null;
+        Block block = new Block();
         String delim = "@block";
         try {
             Statement st = db.con.createStatement();
@@ -115,6 +115,25 @@ public class sql {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static void sendRemainingHash(String ip,String hash){
+        try{
+            Statement st = db.con.createStatement();
+            ResultSet rs = st.executeQuery("Select hash from block where prevhash = '"+hash+"';"); 
+            while(rs.next()){
+                hash = rs.getString("hash");
+                Block newBlock = createBlock(hash);
+                Message msg = new Message(4,newBlock.toString());
+                Server.sendMessage(ip, msg);
+                rs.close();
+                rs = st.executeQuery("Select hash from block where prevhash = '"+hash+"';");
+            }
+            Message msg = new Message(5,"upto date.");
+            Server.sendMessage(ip, msg);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
     }
 
     public static void storeblock(Block newBlock) {
@@ -218,8 +237,7 @@ public class sql {
 
     public static void main(String[] args) {
         dropDatabase();
-        db obj = new db();
-        Connection conn = obj.con;
+        Connection conn = db.con;
         try {
             Statement stmt = conn.createStatement();
             boolean rset;
@@ -274,7 +292,7 @@ public class sql {
                     "PRIMARY KEY (id)," +
                     "FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id)" +
                     ");");
-            System.out.println("Database created successfully...");
+            System.out.println("Database created successfully..."+!rset);
 
         } catch (SQLException e) {
             e.printStackTrace();

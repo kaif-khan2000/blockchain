@@ -36,7 +36,7 @@ public class Transaction {
 		int inputLength = Integer.parseInt(parts[4]);
 		this.inputs = new ArrayList<TransactionInput>();
 		for(int i = 0; i < inputLength; i++) {
-			this.inputs.add(new TransactionInput(parts[5+i],1));
+			this.inputs.add(new TransactionInput(parts[5+i]));
 		}
 		this.outputs = new ArrayList<TransactionOutput>();
 		

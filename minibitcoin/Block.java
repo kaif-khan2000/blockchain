@@ -13,6 +13,7 @@ public class Block{
 
 	private String delim = "@block";
 	
+	public Block() {}
     public Block ( String prevHash){    
         this.prevHash = prevHash;
         this.timestamp = new Date().getTime();

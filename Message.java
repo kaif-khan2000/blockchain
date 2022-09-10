@@ -1,6 +1,5 @@
 import java.util.*;
 import java.net.*;
-import java.io.IOException;
 
 public class Message {
     public String mId;

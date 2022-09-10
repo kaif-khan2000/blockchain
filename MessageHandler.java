@@ -13,6 +13,9 @@ class MessageClassifier extends Thread{
         this.client = client;
     }
 
+    public static int fetchedIps = 0; //0 not fetched yet, -1 fetched but no ips, 1 fetched ip's
+    public static int fetchedRemainingBlocks = 0; //0 not fetched yet ,1 fetched
+
     public void run() {
         if(message.mType == 0){
             // requesting ip addresses
@@ -39,7 +42,9 @@ class MessageClassifier extends Thread{
                 }
             }
             if (ips.length>1)
-                Server.disconnectFromServer(Server.seed);
+                fetchedIps = 1;
+            else
+                fetchedIps = -1;
             return;
         }
 
@@ -60,7 +65,23 @@ class MessageClassifier extends Thread{
         }
         
         if(message.mType == 3) {
+            //requesting for remaining blocks
             String hash = message.data;
+            sql.sendRemainingHash(client.getInetAddress().toString(),hash);
+            return;
+        }
+
+        if(message.mType == 4){
+            //getting a block from seed node.
+            Block newBlock = new Block(message.data);
+            if(newBlock.hash.equals(newBlock.CalculateHash()))
+                sql.storeblock(newBlock);
+            return;
+        }
+
+        if(message.mType == 5){
+            fetchedRemainingBlocks = 1;
+            return;
         }
     }
 }

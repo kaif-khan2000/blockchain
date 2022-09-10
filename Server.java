@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Server extends Thread {
@@ -241,7 +240,7 @@ public class Server extends Thread {
     }
     public static void build(Message[] messagepool1, int messageCount) {
         
-        String[] ip = {"192.168.134.152"};
+        //String[] ip = {"192.168.134.152"};
         messagepool = messagepool1;
         mCount = messageCount;
         for (int i = 0; i < n; i++) {

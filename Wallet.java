@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.awt.*;
 import javax.swing.*;
-import minibitcoin.*;
 
 public class Wallet extends Thread {
     public static PrivateKey privateKey;
@@ -121,6 +120,7 @@ public class Wallet extends Thread {
                     sql.storeblock(genesisBlock);
 
                     // //seed node creating a block with 100 coins
+                    // To use the below code please comment processTransaction in addTransaction
                     // Block block = new Block(genesisBlock.hash);
                     // Transaction t = new Transaction(publicKey, publicKey, 100, null);
                     // ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();

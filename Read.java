@@ -39,6 +39,7 @@ class Read extends Thread {
 			}
 		}catch(Exception e){
 			e.printStackTrace();
+			System.out.println("Read Index"+index);
 		}
 	}
 }

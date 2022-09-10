@@ -2,7 +2,6 @@
 // Connecting to the Database
 
 import java.sql.*;
-import java.util.Scanner;
 
 public class db
 {
@@ -21,7 +20,8 @@ public class db
 			// String pass = sc.nextLine();
 
 			
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bitcoin","ravi","password");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bitcoin","kaif","ali@6666");
+			
 
 			// if (con != null)			
 			// 	System.out.println("Connected");		
