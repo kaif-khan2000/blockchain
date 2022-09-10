@@ -84,7 +84,7 @@ public class sql {
         String delim = "@block";
         try {
             Statement st = db.con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM blocks WHERE hash = '" + hash + "';");
+            ResultSet rs = st.executeQuery("SELECT * FROM block WHERE hash = '" + hash + "';");
             String result = "";
             if (rs.next()) {
                 hash = rs.getString("hash");
