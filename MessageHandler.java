@@ -112,6 +112,7 @@ public class MessageHandler {
             messagepool[messageCount] = message;
             messageCount++;
             msgLookUp.put(message.mId, message.timestamp);
+            System.out.println("received message: "+ message.toString())
             MessageClassifier m = new MessageClassifier(message, client);
             m.start();
             

@@ -32,14 +32,14 @@ public class Server extends Thread {
     public static String getIps() {
         String ips = "";
         for (int i = 0; i < 2*n; i++) {
-            if (servers[i] != null) {
+            try{
                 String ip1 = servers[i].client1.getInetAddress().toString().replace("/", ""); 
                 ips += ip1 + ",";
-            }
-            if(client[i] != null){
+            } catch (Exception e){}
+            try {
                 String ip1 = client[i].client1.getInetAddress().toString().replace("/", ""); 
                 ips += ip1 + ",";
-            }
+            } catch (Exception e){}
         }
         return ips;
     }
