@@ -48,7 +48,7 @@ public class Message {
         this.mType = Integer.parseInt(message[1]);
         this.ip = message[2];
         this.timestamp = Long.parseLong(message[3]);
-        this.data = message[4];
+        try{this.data = message[4];} catch(Exception e){System.out.println(messageString);e.printStackTrace();}
     }
 
     public void print() {

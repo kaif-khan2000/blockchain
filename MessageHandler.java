@@ -30,6 +30,10 @@ class MessageClassifier extends Thread{
         if (message.mType == 1) {
             // we have received ip addresses
             System.out.println("type 1:"+message.data);
+            if(message.data.equals(" ")){
+                fetchedIps = -1;
+                return;
+            }
             String[] ips = message.data.split(",");
             int count = 0;
             for (String ip :ips){
@@ -41,7 +45,7 @@ class MessageClassifier extends Thread{
                     e.printStackTrace();
                 }
             }
-            if (ips.length>1)
+            if (count>0)
                 fetchedIps = 1;
             else
                 fetchedIps = -1;

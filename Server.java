@@ -30,7 +30,7 @@ public class Server extends Thread {
     public static String ip[] = new String[100];
     
     public static String getIps(Socket user) {
-        String ips = "";
+        String ips = " ";
         String userIp = user.getInetAddress().toString().replace("/", "");
         for (int i = 0; i < 2*n; i++) {
             try{
