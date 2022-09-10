@@ -32,8 +32,13 @@ public class Server extends Thread {
     public static String getIps() {
         String ips = "";
         for (int i = 0; i < 2*n; i++) {
-            if (ip[i] != null && !ip[i].equals("")) { 
-                ips += ip[i] + ",";
+            if (servers[i] != null) {
+                String ip1 = servers[i].client1.getInetAddress().toString().replace("/", ""); 
+                ips += ip1 + ",";
+            }
+            if(client[i] != null){
+                String ip1 = client[i].client1.getInetAddress().toString().replace("/", ""); 
+                ips += ip1 + ",";
             }
         }
         return ips;
@@ -61,7 +66,7 @@ public class Server extends Thread {
         servers[index] = new Server(false);
         servers[index].setName("ClientThread-" + index);
         servers[index].start();
-        try{TimeUnit.SECONDS.sleep(20);}catch(InterruptedException e){e.printStackTrace();}
+        try{TimeUnit.SECONDS.sleep(5);}catch(InterruptedException e){e.printStackTrace();}
     }
     
     public static void disconnectFromServer(String ip1) {
@@ -268,7 +273,7 @@ public class Server extends Thread {
                 fetchRemainingBlocks();       
                 Message message = new Message(0,"giveMeAddress");
                 sendMessage(seed, message);
-                while(MessageClassifier.fetchedIps == 0 && MessageClassifier.fetchedRemainingBlocks == 0);
+                while(MessageClassifier.fetchedIps == 0 || MessageClassifier.fetchedRemainingBlocks == 0);
                 if(MessageClassifier.fetchedIps == 1)
                     disconnectFromServer(seed);
 

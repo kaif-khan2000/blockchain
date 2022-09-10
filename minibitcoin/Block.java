@@ -22,7 +22,7 @@ public class Block{
 
 	public Block(String message, int val){
 		String[] parts = message.split(delim);
-		this.prevHash = parts[0];
+		this.hash = parts[0];
 		this.prevHash = parts[1];
 		this.merkleRoot = parts[2];
 		this.timestamp = Long.parseLong(parts[3]);
