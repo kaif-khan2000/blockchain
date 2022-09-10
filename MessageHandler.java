@@ -23,7 +23,7 @@ class MessageClassifier extends Thread{
             String ips = Server.getIps();
             Message newMessage = new Message(1,ips);
             System.out.println("messageSent:"+newMessage.toString());
-            Server.sendMessage(client.getInetAddress().toString(), newMessage);
+            Server.sendMessage(client, newMessage);
             return;
         }
 
@@ -67,13 +67,13 @@ class MessageClassifier extends Thread{
         if(message.mType == 3) {
             //requesting for remaining blocks
             String hash = message.data;
-            sql.sendRemainingHash(client.getInetAddress().toString(),hash);
+            sql.sendRemainingHash(client,hash);
             return;
         }
 
         if(message.mType == 4){
             //getting a block from seed node.
-            Block newBlock = new Block(message.data);
+            Block newBlock = new Block(message.data,1);
             if(newBlock.hash.equals(newBlock.CalculateHash()))
                 sql.storeblock(newBlock);
             return;

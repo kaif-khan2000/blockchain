@@ -1,4 +1,5 @@
 
+import java.net.Socket;
 import java.security.PublicKey;
 import java.sql.*;
 import java.util.ArrayList;
@@ -81,22 +82,22 @@ public class sql {
 
     public static Block createBlock(String hash) {
         Block block = new Block();
-        String delim = "@block";
         try {
             Statement st = db.con.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM block WHERE hash = '" + hash + "';");
-            String result = "";
             if (rs.next()) {
                 hash = rs.getString("hash");
                 String prevHash = rs.getString("prevHash");
-                String merkleRoot = rs.getString("merkleRoot");
+                String merkleRoot = rs.getString("merkletree");
                 long timestamp = rs.getLong("timestamp");
                 int nonce = rs.getInt("nonce");
-                result = hash + delim + prevHash + delim + merkleRoot + delim + Long.toString(timestamp) + delim
-                        + Integer.toString(nonce);
+                block.hash = hash;
+                block.prevHash = prevHash;
+                block.merkleRoot = merkleRoot;
+                block.timestamp = timestamp;
+                block.nonce = nonce;                
             }
 
-            block = new Block(result, 0);
             block.transactions = fetchTransactions(hash);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -117,7 +118,7 @@ public class sql {
         return "";
     }
 
-    public static void sendRemainingHash(String ip,String hash){
+    public static void sendRemainingHash(Socket client,String hash){
         try{
             Statement st = db.con.createStatement();
             ResultSet rs = st.executeQuery("Select hash from block where prevhash = '"+hash+"';"); 
@@ -125,12 +126,12 @@ public class sql {
                 hash = rs.getString("hash");
                 Block newBlock = createBlock(hash);
                 Message msg = new Message(4,newBlock.toString());
-                Server.sendMessage(ip, msg);
+                Server.sendMessage(client, msg);
                 rs.close();
                 rs = st.executeQuery("Select hash from block where prevhash = '"+hash+"';");
             }
             Message msg = new Message(5,"upto date.");
-            Server.sendMessage(ip, msg);
+            Server.sendMessage(client, msg);
         }catch(SQLException e){
             e.printStackTrace();
         }

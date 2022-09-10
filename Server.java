@@ -162,6 +162,17 @@ public class Server extends Thread {
         
     }
 
+    public static void sendMessage(Socket client,Message message){
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(client.getOutputStream(), true);            
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
+        System.out.println("\nsending message to " + client.getInetAddress().toString());
+        out.println(message);
+        System.out.println("\nmessage sent to " + client.getInetAddress().toString() + " "+ message.toString() + "\n");
+    }
     public static void broadcast(Message message) {
         for(int i=0;i<2*n;i++){
             if(ip[i]!=null && ip[i]!=""){
