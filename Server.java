@@ -69,7 +69,7 @@ public class Server extends Thread {
         servers[index] = new Server(false);
         servers[index].setName("ClientThread-" + index);
         servers[index].start();
-        try{TimeUnit.SECONDS.sleep(5);}catch(InterruptedException e){e.printStackTrace();}
+        try{TimeUnit.SECONDS.sleep(10);}catch(InterruptedException e){e.printStackTrace();}
         return servers[index].client1;
     }
     
@@ -171,16 +171,16 @@ public class Server extends Thread {
         
     }
 
-    public static void sendMessage(Socket client,Message message){
+    public static void sendMessage(Socket user,Message message){
         PrintWriter out = null;
         try {
-            out = new PrintWriter(client.getOutputStream(), true);            
+            out = new PrintWriter(user.getOutputStream(), true);            
         } catch (IOException i) {
             i.printStackTrace();
         }
-        System.out.println("\nsending message to " + client.getInetAddress().toString());
+        System.out.println("\nsending message to " + user.getInetAddress().toString());
         out.println(message);
-        System.out.println("\nmessage sent to " + client.getInetAddress().toString() + " "+ message.toString() + "\n");
+        System.out.println("\nmessage sent to " + user.getInetAddress().toString() + " "+ message.toString() + "\n");
     }
     // public static void broadcast(Message message) {
     //     for(int i=0;i<2*n;i++){
@@ -241,12 +241,12 @@ public class Server extends Thread {
         int index = Integer.parseInt(Thread.currentThread().getName().replace("ClientThread-", ""));
         try {
             index = n + index;
-            server1 = new Socket(ip[index], port);
+            client1 = new Socket(ip[index], port);
             System.out.println("Connected to server " + ip[index]);
-            Read thread = new Read(server1,index);
+            Read thread = new Read(client1,index);
             thread.start();
             thread.join();
-            server1.close();
+            client1.close();
             ip[index] = "";
             servers[index - n] = null;
 
