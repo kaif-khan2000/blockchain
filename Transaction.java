@@ -2,6 +2,7 @@
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Date;
 
 
 public class Transaction {
@@ -10,10 +11,11 @@ public class Transaction {
     public PublicKey reciepient; // Recipients address/public key.
     public float value;
     public byte[] signature; // this is to prevent anybody else from spending funds in our wallet.
+	public long timestamp;
     public ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
     public ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
 
-    private static int sequence = 0; // a rough count of how many transactions have been generated. 
+    public static int sequence = 0; // a rough count of how many transactions have been generated. 
 	public static String delim = " & ";
     private float tempValue;
 	// Constructor: 
@@ -25,6 +27,7 @@ public class Transaction {
         this.value = value;
         this.inputs = inputs;
 		this.tempValue = tempValue;
+		this.timestamp = new Date().getTime();
     }
 
 	public Transaction(String message) {
@@ -45,6 +48,7 @@ public class Transaction {
 			this.outputs.add(new TransactionOutput(parts[6+inputLength+i]));
 		}
 		this.signature = parts[6+inputLength+outputLength].getBytes();
+		this.timestamp = Long.parseLong(parts[7+inputLength+outputLength]);
 	}
 	
 	public void print() {
@@ -53,11 +57,10 @@ public class Transaction {
 
     //This Calculates the transaction hash (which will be used as its Id)
     private String calculateHash() {
-        sequence++; //increase the sequence to avoid 2 identical transactions having the same hash
         return StringUtil.applySha256(
                 StringUtil.getStringFromKey(sender) +
                 StringUtil.getStringFromKey(reciepient) +
-                Float.toString(value)
+                Float.toString(value) + timestamp
                 );
     }
 
@@ -92,8 +95,8 @@ public class Transaction {
 		//generate transaction outputs:
 		float leftOver = tempValue - value; //get value of inputs then the left over change:
 		transactionId = calculateHash();
-		outputs.add(new TransactionOutput(this.reciepient, value,transactionId)); //send value to recipient
-		outputs.add(new TransactionOutput(this.sender, leftOver,transactionId)); //send the left over 'change' back to sender	
+		outputs.add(new TransactionOutput(this.reciepient, value,transactionId,1)); //send value to recipient
+		outputs.add(new TransactionOutput(this.sender, leftOver,transactionId,1)); //send the left over 'change' back to sender	
 	}
 		
 
@@ -135,7 +138,7 @@ public class Transaction {
 		result += delim + outputLength;
 		if (outputLength > 0)
 			result += delim + outputstring;
-		result += delim + signature.toString();
+		result += delim + signature.toString() + delim + timestamp;
 		return result;
 	}
 

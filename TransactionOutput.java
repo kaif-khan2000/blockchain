@@ -1,10 +1,5 @@
 
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 
 public class TransactionOutput {
  
@@ -12,13 +7,15 @@ public class TransactionOutput {
 	public PublicKey reciepient; //also known as the new owner of these coins.
 	public float value; //the amount of coins they own
 	public String parentTransactionId; //the id of the transaction this output was created in
+	public int utxo = 1;
 	
 	//Constructor
-	public TransactionOutput(PublicKey reciepient, float value, String parentTransactionId) {
+	public TransactionOutput(PublicKey reciepient, float value, String parentTransactionId, int utxo) {
 		this.reciepient = reciepient;
 		this.value = value;
 		this.parentTransactionId = parentTransactionId;
 		this.id = StringUtil.applySha256(StringUtil.getStringFromKey(reciepient)+Float.toString(value)+parentTransactionId);
+		this.utxo = utxo;
 	}
 	private String delim = "@top";
 	public TransactionOutput(String message){
@@ -35,6 +32,7 @@ public class TransactionOutput {
 		
 		this.value = Float.parseFloat(parts[2]);
 		this.parentTransactionId = parts[3];
+		this.utxo = Integer.parseInt(parts[4]);
 		
 	}
 	
@@ -51,6 +49,6 @@ public class TransactionOutput {
 	public String toString() {
 		
 		String key = StringUtil.getStringFromKey(reciepient);
-		return id+delim+key+delim+value+delim+parentTransactionId;
+		return id+delim+key+delim+value+delim+parentTransactionId+delim+utxo;
 	}
 }

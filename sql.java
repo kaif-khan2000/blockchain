@@ -69,7 +69,8 @@ public class sql {
                     PublicKey address = StringUtil.getPublicKeyFromString(rsin.getString("address"));
                     Float value = Float.parseFloat(rsin.getString("value"));
                     String transaction_id = rsin.getString("transaction_id");
-                    TransactionOutput to = new TransactionOutput(address, value, transaction_id);
+                    int utxo = Integer.parseInt(rsin.getString("utxo"));
+                    TransactionOutput to = new TransactionOutput(address, value, transaction_id,utxo);
                     TransactionInput tr = new TransactionInput(tran_output,value,to);
                     inputs.add(tr);
                 }
@@ -90,7 +91,8 @@ public class sql {
                 PublicKey address = StringUtil.getPublicKeyFromString(rs.getString("address"));
                 Float value = Float.parseFloat(rs.getString("value"));
                 String transaction_id = rs.getString("transaction_id");
-                TransactionOutput to = new TransactionOutput(address, value, transaction_id);
+                int utxo = Integer.parseInt(rs.getString("utxo"));
+                TransactionOutput to = new TransactionOutput(address, value, transaction_id,utxo);
                 outputs.add(to);
             }
         } catch (SQLException e) {
@@ -209,7 +211,7 @@ public class sql {
             for (Transaction transaction : newBlock.transactions) {
                 MessageHandler.mempool.remove(transaction);
                 rs = st.executeUpdate(
-                        "insert into transaction(transaction_id, publickey_sender,publickey_receiver,value,signature,block_id) values "
+                        "insert into transaction(transaction_id, publickey_sender,publickey_receiver,value,signature,block_id,timestamp) values "
                                 +
                                 // add transaction id here
                                 "('" + transaction.transactionId +
@@ -217,7 +219,8 @@ public class sql {
                                 "','" + StringUtil.getStringFromKey(transaction.reciepient) +
                                 "','" + transaction.value +
                                 "','" + transaction.signature.toString() +
-                                "','" + newBlock.hash + "');");
+                                "','" + newBlock.hash + 
+                                "','" + newBlock.timestamp + "');");
                 if (transaction.inputs != null) {
                     for (TransactionInput input : transaction.inputs) {
                         rs = st.executeUpdate("insert into tran_input(transaction_id,tran_outputid) values " +
@@ -231,7 +234,7 @@ public class sql {
                             "','" + transaction.transactionId +
                             "','" + StringUtil.getStringFromKey(output.reciepient) +
                             "','" + output.value +
-                            "'," + "1" + "" +
+                            "'," + output.utxo + "" +
                             ");");
                 }
             }
@@ -320,6 +323,7 @@ public class sql {
                     "signature varchar(500)," +
                     "sequence int," +
                     "block_id varchar(500)," +
+                    "timestamp varchar(20)," +
                     "PRIMARY KEY (id)," +
                     "UNIQUE(transaction_id)," +
                     "FOREIGN KEY (block_id) REFERENCES block(hash)" +
