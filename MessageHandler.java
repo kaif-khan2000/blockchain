@@ -1,6 +1,5 @@
 import java.util.HashMap;
 
-import minibitcoin.*;
 
 import java.net.Socket;
 import java.util.*;

@@ -1,4 +1,3 @@
-import minibitcoin.*;
 
 
 class Mining extends Thread{

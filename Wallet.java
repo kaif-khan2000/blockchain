@@ -1,5 +1,4 @@
 import java.sql.*;
-import minibitcoin.*;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 import java.util.ArrayList;

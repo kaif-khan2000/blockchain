@@ -4,7 +4,6 @@ import java.security.PublicKey;
 import java.sql.*;
 import java.util.ArrayList;
 
-import minibitcoin.*;
 
 public class sql {
 
