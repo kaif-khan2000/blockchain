@@ -114,7 +114,7 @@ public class sql {
                 Transaction tr = new Transaction();
                 tr.sender = StringUtil.getPublicKeyFromString(senderPk);
                 tr.reciepient = StringUtil.getPublicKeyFromString(receiverPk);
-                tr.signature = signature.getBytes();
+                tr.signature = StringUtil.getSignatureFromString(signature);
                 tr.value = Float.parseFloat(value);
                 tr.transactionId = transaction_id;
                 
@@ -218,7 +218,7 @@ public class sql {
                                 "','" + StringUtil.getStringFromKey(transaction.sender) +
                                 "','" + StringUtil.getStringFromKey(transaction.reciepient) +
                                 "','" + transaction.value +
-                                "','" + transaction.signature.toString() +
+                                "','" + StringUtil.getStringFromSignaure(transaction.signature) +
                                 "','" + newBlock.hash + 
                                 "','" + newBlock.timestamp + "');");
                 if (transaction.inputs != null) {

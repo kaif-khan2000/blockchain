@@ -57,11 +57,16 @@ public class StringUtil {
 			ecdsaVerify.update(data.getBytes());
 			return ecdsaVerify.verify(signature);
 		}catch(Exception e) {
-			System.out.println(signature.toString());
+			System.out.println(StringUtil.getStringFromSignaure(signature));
 			throw new RuntimeException(e);
 		}
 	}
-	
+	public static String getStringFromSignaure(byte[] signature) {
+		return Base64.getEncoder().encodeToString(signature);
+	}
+	public static byte[] getSignatureFromString(String signature) {
+		return Base64.getDecoder().decode(signature);
+	}
 	//Short hand helper to turn Object into a json string
 	public static String getJson(Object o) {
 		return new GsonBuilder().setPrettyPrinting().create().toJson(o);

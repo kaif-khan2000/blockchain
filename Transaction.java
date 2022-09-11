@@ -138,7 +138,7 @@ public class Transaction {
 		result += delim + outputLength;
 		if (outputLength > 0)
 			result += delim + outputstring;
-		result += delim + signature.toString() + delim + timestamp;
+		result += delim + StringUtil.getStringFromSignaure(signature) + delim + timestamp;
 		return result;
 	}
 
