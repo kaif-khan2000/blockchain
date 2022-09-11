@@ -220,7 +220,7 @@ public class sql {
                                 "','" + newBlock.hash + "');");
                 if (transaction.inputs != null) {
                     for (TransactionInput input : transaction.inputs) {
-                        rs = st.executeUpdate("insert into tran_input(transaction_id,transaction_output_id) values " +
+                        rs = st.executeUpdate("insert into tran_input(transaction_id,transaction_outputid) values " +
                                 "('" + transaction.transactionId.toString() +
                                 "','" + input.transactionOutputId.toString() + "');");
                     }
