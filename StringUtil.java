@@ -57,6 +57,7 @@ public class StringUtil {
 			ecdsaVerify.update(data.getBytes());
 			return ecdsaVerify.verify(signature);
 		}catch(Exception e) {
+			System.out.println(signature.toString());
 			throw new RuntimeException(e);
 		}
 	}
