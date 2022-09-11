@@ -22,11 +22,12 @@ public class sql {
     }
 
     public static void createTransaction (PublicKey fromkey, PublicKey tokey, float amount) {
+        String key = StringUtil.getStringFromKey(fromkey);
         //fetch tran_output such that their utxo == 1 and their address == fromkey and their amount >= amount
         try{
             ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
             Statement st = db.con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM tran_output WHERE utxo = 1 AND address = '"+fromkey+"' order by value asc;");
+            ResultSet rs = st.executeQuery("SELECT * FROM tran_output WHERE utxo = 1 AND address = '"+key+"' order by value asc;");
             float tempAmount = 0;
             while(rs.next()){
                 tempAmount += rs.getFloat("value");

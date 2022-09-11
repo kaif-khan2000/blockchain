@@ -184,13 +184,12 @@ public class Wallet extends Thread {
         send.addActionListener(l -> {
             System.out.println("Updating balance");
             balance.setText("Balance: "+sql.fetchBalance());
-            String from = myAddress.getText();
             String toAddress = to.getText();
             if (toAddress.equals("")){
                 return;
             }
             float amountToSend = Float.parseFloat(amount.getText());
-            PublicKey fromkey = StringUtil.getPublicKeyFromString(from);
+            PublicKey fromkey = publicKey;
             PublicKey tokey = StringUtil.getPublicKeyFromString(toAddress);
             sql.createTransaction(fromkey, tokey, amountToSend);
         });
