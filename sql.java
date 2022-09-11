@@ -47,6 +47,7 @@ public class sql {
             Transaction tr = new Transaction(fromkey, tokey, amount, inputs, tempAmount);
             tr.generateSignature(Wallet.privateKey);
             tr.processTransaction();
+            MessageHandler.mempool.add(tr);
             Message msg = new Message(2, tr.toString());
             Server.broadcast(msg);
         }  catch (SQLException e) {
