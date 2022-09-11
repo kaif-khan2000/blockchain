@@ -1,4 +1,6 @@
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -62,10 +64,19 @@ public class StringUtil {
 		}
 	}
 	public static String getStringFromSignaure(byte[] signature) {
-		return Base64.getEncoder().encodeToString(signature);
+
+		String signTostring = Base64.getEncoder().encodeToString(signature) ;
+		try{signTostring = URLEncoder.encode(signTostring, "UTF-8");}catch(Exception e) {e.printStackTrace();};
+		return signTostring;
 	}
 	public static byte[] getSignatureFromString(String signature) {
-		return Base64.getDecoder().decode(signature);
+		String st;
+		try{
+			st = URLDecoder.decode(signature, "UTF-8");
+			byte[] sign_byte = Base64.getDecoder().decode(st);
+			return sign_byte;
+		}catch(Exception e) {e.printStackTrace();};
+		return null;
 	}
 	//Short hand helper to turn Object into a json string
 	public static String getJson(Object o) {
