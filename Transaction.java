@@ -57,7 +57,7 @@ public class Transaction {
         return StringUtil.applySha256(
                 StringUtil.getStringFromKey(sender) +
                 StringUtil.getStringFromKey(reciepient) +
-                Float.toString(value) + sequence
+                Float.toString(value)
                 );
     }
 
