@@ -64,16 +64,18 @@ public class StringUtil {
 		}
 	}
 	public static String getStringFromSignaure(byte[] signature) {
-
-		String signTostring = Base64.getEncoder().encodeToString(signature) ;
-		try{signTostring = URLEncoder.encode(signTostring, "UTF-8");}catch(Exception e) {e.printStackTrace();};
-		return signTostring;
+		try{
+			String sign = new String(signature, "UTF-8");
+			return sign;
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+		
 	}
 	public static byte[] getSignatureFromString(String signature) {
-		String st;
 		try{
-			st = URLDecoder.decode(signature, "UTF-8");
-			byte[] sign_byte = Base64.getDecoder().decode(st);
+			byte[] sign_byte = signature.getBytes("UTF-8");
 			return sign_byte;
 		}catch(Exception e) {e.printStackTrace();};
 		return null;
