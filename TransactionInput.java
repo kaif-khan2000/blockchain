@@ -1,4 +1,4 @@
-package minibitcoin;
+
 
 public class TransactionInput {
     

@@ -58,12 +58,38 @@ class MessageClassifier extends Thread{
             Transaction transaction = new Transaction(message.data);
             
             //Server.broadcast(message);
-            if (transaction.processTransaction()){
-                System.out.println("Transaction is valid");
-            
+            if (!transaction.verifyTransaction()){
+                System.out.println("Transaction is not valid");
+                return;
             }
-            else{
-                System.out.println("Transaction is invalid");
+            
+            //check weather the transaction inputs are valid
+		    float tempAmount = 0;
+		    for(TransactionInput i : transaction.inputs){
+			    float temp = sql.checkUTXOExist(i.transactionOutputId);
+                if(temp == -1){
+                    System.out.println("Transaction input is not valid");
+                    return;
+                }
+                tempAmount += temp;
+            }
+            if(tempAmount < transaction.value){
+                System.out.println("Transaction input is not valid");
+                return;
+            }
+
+            //check weather the transaction output is valid
+            for(TransactionOutput o : transaction.outputs){
+                tempAmount -= o.value;
+            }
+            if(tempAmount != 0){
+                System.out.println("Transaction output is not valid");
+                return;
+            }
+
+            //store it in mempool and broadcast it
+            synchronized(MessageHandler.mempool){
+                MessageHandler.mempool.add(transaction);
             }
             return;
         }
@@ -87,6 +113,23 @@ class MessageClassifier extends Thread{
             fetchedRemainingBlocks = 1;
             return;
         }
+
+        if(message.mType == 6){
+            Block newBlock = new Block(message.data,1);
+            if(newBlock.verifyBlock()){
+                synchronized(MessageHandler.blockReceived){
+                    MessageHandler.blockReceived = true;
+                }
+                sql.storeblock(newBlock);
+                System.out.println("Block received and verified");
+            }
+            else{
+                System.out.println("Block received but not verified");
+            }
+            synchronized(MessageHandler.blockReceived){
+                MessageHandler.blockReceived = false;
+            }
+        }
     }
 }
 
@@ -100,9 +143,9 @@ public class MessageHandler {
 
     public static Message[] messagepool = new Message[10];
     public static int messageCount = 0;
-    public static Transaction[] mempool = new Transaction[10];
+    public static List<Transaction> mempool = Collections.synchronizedList(new ArrayList<Transaction>());
     public static int mempoolCount = 0;
-
+    public static Boolean blockReceived = false;
     public static HashMap<String, Long> msgLookUp = new HashMap<String, Long>();
 
     public static void addToMessagepool(Message message, Socket client) {

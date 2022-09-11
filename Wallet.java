@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.awt.*;
 import javax.swing.*;
+import java.security.*;
 
 public class Wallet extends Thread {
     public static PrivateKey privateKey;
@@ -34,42 +35,32 @@ public class Wallet extends Thread {
     // }
     // }
 
-    public float getBalance() {
-        float total = 0;
-        for (Map.Entry<String, TransactionOutput> item : Minichain.UTXOs.entrySet()) {
-            TransactionOutput UTXO = item.getValue();
-            if (UTXO.isMine(publicKey)) { // if output belongs to me ( if coins belong to me )
-                UTXOs.put(UTXO.id, UTXO); // add it to our list of unspent transactions.
-                total += UTXO.value;
-            }
-        }
-        return total;
-    }
+    
 
-    public Transaction sendFunds(PublicKey _recipient, float value) {
-        if (getBalance() < value) {
-            System.out.println("#Not Enough funds to send transaction. Transaction Discarded.");
-            return null;
-        }
-        ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
+    // public Transaction sendFunds(PublicKey _recipient, float value) {
+    //     if (getBalance() < value) {
+    //         System.out.println("#Not Enough funds to send transaction. Transaction Discarded.");
+    //         return null;
+    //     }
+    //     ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
 
-        float total = 0;
-        for (Map.Entry<String, TransactionOutput> item : UTXOs.entrySet()) {
-            TransactionOutput UTXO = item.getValue();
-            total += UTXO.value;
-            inputs.add(new TransactionInput(UTXO.id));
-            if (total > value)
-                break;
-        }
+    //     float total = 0;
+    //     for (Map.Entry<String, TransactionOutput> item : UTXOs.entrySet()) {
+    //         TransactionOutput UTXO = item.getValue();
+    //         total += UTXO.value;
+    //         inputs.add(new TransactionInput(UTXO.id));
+    //         if (total > value)
+    //             break;
+    //     }
 
-        Transaction newTransaction = new Transaction(publicKey, _recipient, value, inputs);
-        newTransaction.generateSignature(privateKey);
+    //     Transaction newTransaction = new Transaction(publicKey, _recipient, value, inputs);
+    //     newTransaction.generateSignature(privateKey);
 
-        for (TransactionInput input : inputs) {
-            UTXOs.remove(input.transactionOutputId);
-        }
-        return newTransaction;
-    }
+    //     for (TransactionInput input : inputs) {
+    //         UTXOs.remove(input.transactionOutputId);
+    //     }
+    //     return newTransaction;
+    // }
 
     public void generateKeyPair() {
         try {
@@ -200,14 +191,9 @@ public class Wallet extends Thread {
                 return;
             }
             float amountToSend = Float.parseFloat(amount.getText());
-            ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
-            inputs.add(new TransactionInput(from));
             PublicKey fromkey = StringUtil.getPublicKeyFromString(from);
             PublicKey tokey = StringUtil.getPublicKeyFromString(toAddress);
-            Transaction tr = new Transaction(fromkey, tokey, amountToSend, inputs);
-            tr.generateSignature(privateKey);
-            Server.broadcast(new Message(2, tr.toString()));
-
+            sql.createTransaction(fromkey, tokey, amountToSend);
         });
 
         // setup GUI

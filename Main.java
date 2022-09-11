@@ -27,11 +27,10 @@ class Mining extends Thread{
 // }
 
 public class Main {
+    
     public static void main(String[] args){
         
-        Message[] messagepool = new Message[10];
-        int messageCount = 0;        
-        Server.build(messagepool,messageCount);
+        Server.build();
         
     }
 }

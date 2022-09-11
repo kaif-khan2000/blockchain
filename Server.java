@@ -13,7 +13,7 @@ public class Server extends Thread {
     public static Server client[] = new Server[n];
     public static final int port = 8080;
     public static String clientIps;
-    
+
     static {
         try {
             server = new ServerSocket(8080);
@@ -28,28 +28,30 @@ public class Server extends Thread {
     public static Message[] messagepool;
     public static int mCount;
     public static String ip[] = new String[100];
-    
+
     public static String getIps(Socket user) {
         String ips = " ";
         String userIp = user.getInetAddress().toString().replace("/", "");
-        for (int i = 0; i < 2*n; i++) {
-            try{
-                String ip1 = servers[i].client1.getInetAddress().toString().replace("/", ""); 
-                if(!ip1.equals(userIp))
-                    ips += ip1 + ",";
-            } catch (Exception e){}
+        for (int i = 0; i < 2 * n; i++) {
             try {
-                String ip1 = client[i].client1.getInetAddress().toString().replace("/", ""); 
-                if(!ip1.equals(userIp))
+                String ip1 = servers[i].client1.getInetAddress().toString().replace("/", "");
+                if (!ip1.equals(userIp))
                     ips += ip1 + ",";
-            } catch (Exception e){}
+            } catch (Exception e) {
+            }
+            try {
+                String ip1 = client[i].client1.getInetAddress().toString().replace("/", "");
+                if (!ip1.equals(userIp))
+                    ips += ip1 + ",";
+            } catch (Exception e) {
+            }
         }
         return ips;
     }
 
     public static Socket connectToServer(String ip1) {
-        
-        if(ip1.equals(Message.tempIp)){
+
+        if (ip1.equals(Message.tempIp)) {
             return null;
         }
         if (ip1.equals("")) {
@@ -69,10 +71,14 @@ public class Server extends Thread {
         servers[index] = new Server(false);
         servers[index].setName("ClientThread-" + index);
         servers[index].start();
-        try{TimeUnit.SECONDS.sleep(10);}catch(InterruptedException e){e.printStackTrace();}
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return servers[index].client1;
     }
-    
+
     public static void disconnectFromServer(String ip1) {
         int index = fetchIndex(ip1);
         if (index == -1) {
@@ -101,48 +107,49 @@ public class Server extends Thread {
     }
 
     public static int fetchIndex(String ipAddress) {
-        for (int i = 0; i < 2*n; i++) {
+        for (int i = 0; i < 2 * n; i++) {
             if (ip[i] != null && ip[i] != "") {
-                try{
+                try {
                     if (ip[i].equals(ipAddress)) {
                         return i;
                     }
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
-                
+
             }
         }
         return -1;
     }
 
     // public static void sendMessage(String ip, Message message) {
-    //     if(ip.equals(Message.tempIp)){
-    //         return;
-    //     }
-    //     int index = fetchIndex(ip);
-    //     if (index == -1) {
-    //         System.out.println("sendMess: IP is not connected.");
-    //         return;
-    //     }
-    //     PrintWriter out = null;
-    //     try {
-    //         if (index < n) {
-    //             out = new PrintWriter(client[index].client1.getOutputStream(), true);
-    //         } else {
-    //             try{
-    //                 out = new PrintWriter(servers[index - n].server1.getOutputStream(), true);
-    //             } catch (NullPointerException e) {
-    //                 e.printStackTrace();
-    //             }
-    //         }
-    //     } catch (IOException i) {
-    //         i.printStackTrace();
-    //     }
-    //     System.out.println("\nsending message to " + ip);
-    //     out.println(message.toString());
-    //     System.out.println("\nmessage sent to " + ip + " "+ message.toString() + "\n");
-        
+    // if(ip.equals(Message.tempIp)){
+    // return;
+    // }
+    // int index = fetchIndex(ip);
+    // if (index == -1) {
+    // System.out.println("sendMess: IP is not connected.");
+    // return;
+    // }
+    // PrintWriter out = null;
+    // try {
+    // if (index < n) {
+    // out = new PrintWriter(client[index].client1.getOutputStream(), true);
+    // } else {
+    // try{
+    // out = new PrintWriter(servers[index - n].server1.getOutputStream(), true);
+    // } catch (NullPointerException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    // } catch (IOException i) {
+    // i.printStackTrace();
+    // }
+    // System.out.println("\nsending message to " + ip);
+    // out.println(message.toString());
+    // System.out.println("\nmessage sent to " + ip + " "+ message.toString() +
+    // "\n");
+
     // }
 
     public static void sendMessage(String ip, String message) {
@@ -156,7 +163,7 @@ public class Server extends Thread {
             if (index < n) {
                 out = new PrintWriter(client[index].client1.getOutputStream(), true);
             } else {
-                try{
+                try {
                     out = new PrintWriter(servers[index - n].server1.getOutputStream(), true);
                 } catch (NullPointerException e) {
                     e.printStackTrace();
@@ -167,45 +174,46 @@ public class Server extends Thread {
         }
         System.out.println("\nsending message to " + ip);
         out.println(message);
-        System.out.println("\nmessage sent to " + ip + " "+ message.toString() + "\n");
-        
+        System.out.println("\nmessage sent to " + ip + " " + message.toString() + "\n");
+
     }
 
-    public static void sendMessage(Socket user,Message message){
+    public static void sendMessage(Socket user, Message message) {
         PrintWriter out = null;
         try {
-            out = new PrintWriter(user.getOutputStream(), true);            
+            out = new PrintWriter(user.getOutputStream(), true);
         } catch (IOException i) {
             i.printStackTrace();
         }
         System.out.println("\nsending message to " + user.getInetAddress().toString());
         out.println(message);
-        System.out.println("\nmessage sent to " + user.getInetAddress().toString() + " "+ message.toString() + "\n");
+        System.out.println("\nmessage sent to " + user.getInetAddress().toString() + " " + message.toString() + "\n");
     }
     // public static void broadcast(Message message) {
-    //     for(int i=0;i<2*n;i++){
-    //         if(ip[i]!=null && ip[i]!=""){
-    //             sendMessage(ip[i], message);
-    //         }
-    //     }
+    // for(int i=0;i<2*n;i++){
+    // if(ip[i]!=null && ip[i]!=""){
+    // sendMessage(ip[i], message);
+    // }
+    // }
     // }
 
     public static void broadcast(Message message) {
-        for(int i=0;i<n;i++){
+        for (int i = 0; i < n; i++) {
             try {
                 sendMessage(servers[i].client1, message);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             try {
                 sendMessage(client[i].client1, message);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
     }
-    
 
     public Server(boolean isServer) {
         this.isServer = isServer;
-        
+
     }
 
     public void serverFunction() {
@@ -218,9 +226,9 @@ public class Server extends Thread {
                 client1 = server.accept();
                 System.out.println("Client joined");
                 String ip1 = client1.getInetAddress().toString().replace("/", "");
-				ip[index] = ip1;
+                ip[index] = ip1;
                 sendMessage(ip[index], "connected");
-                Read thread = new Read(client1,index);
+                Read thread = new Read(client1, index);
                 thread.start();
                 thread.join();
                 client1.close();
@@ -228,8 +236,11 @@ public class Server extends Thread {
             }
         } catch (IOException i) {
             i.printStackTrace();
-            try {client1.close();}
-            catch(Exception e){e.printStackTrace();}
+            try {
+                client1.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             ip[index] = "";
         } catch (Exception e) {
             e.printStackTrace();
@@ -243,7 +254,7 @@ public class Server extends Thread {
             index = n + index;
             client1 = new Socket(ip[index], port);
             System.out.println("Connected to server " + ip[index]);
-            Read thread = new Read(client1,index);
+            Read thread = new Read(client1, index);
             thread.start();
             thread.join();
             client1.close();
@@ -271,42 +282,67 @@ public class Server extends Thread {
         Message message = new Message(3, hash);
         sendMessage(seed, message);
     }
-    public static void build(Message[] messagepool1, int messageCount) {
-        
-        //String[] ip = {"192.168.134.152"};
-        messagepool = messagepool1;
-        mCount = messageCount;
+
+    public static int difficulty = 3;
+
+    public static void build() {
+
+        // String[] ip = {"192.168.134.152"};
+
         for (int i = 0; i < n; i++) {
             client[i] = new Server(true);
             client[i].setName("ServerThread-" + i);
             client[i].start();
         }
         new Wallet().start();
-        try{
-            //System.out.println(Message.tempIp);
-            if(!Message.tempIp.equals(seed)){
-                System.out.println("\nEstablishing connection with seed " + seed+"\n");
+        try {
+            // System.out.println(Message.tempIp);
+            if (!Message.tempIp.equals(seed)) {
+                System.out.println("\nEstablishing connection with seed " + seed + "\n");
                 Socket seedSock = connectToServer(seed);
-                fetchRemainingBlocks(seedSock);       
-                Message message = new Message(0,"giveMeAddress");
+                fetchRemainingBlocks(seedSock);
+                Message message = new Message(0, "giveMeAddress");
                 sendMessage(seedSock, message);
-                while(MessageClassifier.fetchedIps == 0 || MessageClassifier.fetchedRemainingBlocks == 0);
-                if(MessageClassifier.fetchedIps == 1)
+                while (MessageClassifier.fetchedIps == 0 || MessageClassifier.fetchedRemainingBlocks == 0)
+                    ;
+                if (MessageClassifier.fetchedIps == 1)
                     disconnectFromServer(seed);
-
 
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-        
-        // for (int i= 0;i<ip.length;i++){
-        //     try{
-        //         connectToServer(ip[i]);
-        //     } catch (Exception e){
-        //         System.out.println("UserError:" + e);
-        //     }
-        // }
+
+        // start mining
+        while (true) {
+            
+            while (true) {
+                synchronized (MessageHandler.blockReceived) {
+                    if (!MessageHandler.blockReceived) {
+                        break;
+                    }
+                }
+            }
+            String prevHash = sql.getLastHash();
+            Block block = new Block(prevHash);
+            int count = 0;
+            synchronized (MessageHandler.mempool) {
+                if(MessageHandler.mempool.isEmpty()) continue;
+                for (Transaction tr : MessageHandler.mempool) {
+                    block.addTransaction(tr);
+                    count++;
+                    if (count == 5)
+                        break;
+                }
+            }
+
+            int x = block.mineBlock(Server.difficulty);
+            if (x == 1) {
+                Message msg = new Message(6, block.toString());
+                Server.broadcast(msg);
+                sql.storeblock(block);
+            }
+        }
+
     }
 }

@@ -8,6 +8,52 @@ import minibitcoin.*;
 
 public class sql {
 
+    public static float checkUTXOExist(String transactionOutputId) {
+        try {
+            Statement stmt = db.con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from tran_output where utxo = 1 and tranoutput_id = '" + transactionOutputId + "'");
+            if (rs.next()) {
+                return rs.getFloat("value");
+            }
+            stmt.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return -1;
+    }
+
+    public static void createTransaction (PublicKey fromkey, PublicKey tokey, float amount) {
+        //fetch tran_output such that their utxo == 1 and their address == fromkey and their amount >= amount
+        try{
+            ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
+            Statement st = db.con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM tran_output WHERE utxo = 1 AND address = '"+fromkey+"' order by value asc;");
+            float tempAmount = 0;
+            while(rs.next()){
+                tempAmount += rs.getFloat("value");
+                TransactionInput in = new TransactionInput(rs.getString("tranoutput_id"));
+                inputs.add(in);
+                if(tempAmount >= amount){
+                    break;
+                }
+            }
+            if (tempAmount < amount){
+                System.out.println("Not enough funds to send transaction. Transaction Discarded.");
+                return;
+            }
+            for (TransactionInput input : inputs) {
+                st.executeUpdate("UPDATE tran_output SET utxo = 0 WHERE tranoutput_id = '"+input.transactionOutputId+"';");
+            }
+
+            Transaction tr = new Transaction(fromkey, tokey, amount, inputs, tempAmount);
+            tr.generateSignature(Wallet.privateKey);
+            tr.processTransaction();
+            Message msg = new Message(2, tr.toString());
+            Server.broadcast(msg);
+        }  catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     public static ArrayList<TransactionInput> fetchInputs(String t_id){
         ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
         //write code here
@@ -17,7 +63,7 @@ public class sql {
             while (rs.next()) {
                 String tran_output = rs.getString("tran_outputid");//TransactionInput table have reference to transactionoutput table
                 //Searching for tranoutput_id in tran_output table to UTXO which is TransactionOutput object
-                ResultSet rsin = st.executeQuery("SELECT * FROM tran_output where tran_outputid = '" + tran_output + "';");
+                ResultSet rsin = st.executeQuery("SELECT * FROM tran_output where tranoutput_id = '" + tran_output + "';");
                 if(rsin.next()) {
                     PublicKey address = StringUtil.getPublicKeyFromString(rsin.getString("address"));
                     Float value = Float.parseFloat(rsin.getString("value"));
@@ -160,6 +206,7 @@ public class sql {
                 return;
             }
             for (Transaction transaction : newBlock.transactions) {
+                MessageHandler.mempool.remove(transaction);
                 rs = st.executeUpdate(
                         "insert into transaction(transaction_id, publickey_sender,publickey_receiver,value,signature,block_id) values "
                                 +
