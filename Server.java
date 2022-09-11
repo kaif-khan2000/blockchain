@@ -315,7 +315,7 @@ public class Server extends Thread {
 
         // start mining
         while (true) {
-            
+
             while (true) {
                 synchronized (MessageHandler.blockReceived) {
                     if (!MessageHandler.blockReceived) {
@@ -327,7 +327,6 @@ public class Server extends Thread {
             Block block = new Block(prevHash);
             int count = 0;
             synchronized (MessageHandler.mempool) {
-                if(MessageHandler.mempool.isEmpty()) continue;
                 for (Transaction tr : MessageHandler.mempool) {
                     block.addTransaction(tr);
                     count++;
@@ -335,7 +334,9 @@ public class Server extends Thread {
                         break;
                 }
             }
-
+            if (count == 0) {
+                continue;
+            }
             int x = block.mineBlock(Server.difficulty);
             if (x == 1) {
                 Message msg = new Message(6, block.toString());
