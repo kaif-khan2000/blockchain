@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import com.google.gson.GsonBuilder;
 import org.bouncycastle.util.encoders.Encoder;
-
 import java.util.List;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -77,7 +76,8 @@ public class StringUtil {
 
 	}
 
-	public static byte[] getSignatureFromString(String signature) {		
+	public static byte[] getSignatureFromString(String signature) {
+		signature = signature.trim();		
 		byte[] sign = org.bouncycastle.util.encoders.Base64.decode(signature.getBytes());
 		return sign;
 
@@ -184,6 +184,8 @@ public class StringUtil {
 		// String sign = StringUtil.getStringFromSignaure(signature);
 		String sign = Base64.getEncoder().encodeToString(signature);
 		System.out.println(sign);
+
+		
 
 		// byte[] sign_byte = StringUtil.getSignatureFromString(sign);
 		byte[] sign_byte = Base64.getDecoder().decode(sign);
