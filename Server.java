@@ -321,6 +321,11 @@ public class Server extends Thread {
                         break;
                     }
                 }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             String prevHash = sql.getLastHash();
             Block block = new Block(prevHash);
