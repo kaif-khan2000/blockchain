@@ -303,8 +303,7 @@ public class Server extends Thread {
                 fetchRemainingBlocks(seedSock);
                 Message message = new Message(0, "giveMeAddress");
                 sendMessage(seedSock, message);
-                while (MessageClassifier.fetchedIps == 0 || MessageClassifier.fetchedRemainingBlocks == 0)
-                    ;
+                while (MessageClassifier.fetchedIps == 0 || MessageClassifier.fetchedRemainingBlocks == 0);
                 if (MessageClassifier.fetchedIps == 1)
                     disconnectFromServer(seed);
 
