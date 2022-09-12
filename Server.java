@@ -314,19 +314,6 @@ public class Server extends Thread {
 
         // start mining
         while (true) {
-
-            while (true) {
-                synchronized (MessageHandler.blockReceived) {
-                    if (!MessageHandler.blockReceived) {
-                        break;
-                    }
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
             String prevHash = sql.getLastHash();
             Block block = new Block(prevHash);
             int count = 0;

@@ -75,16 +75,30 @@ public class Block{
 		merkleRoot = StringUtil.getMerkleRoot(transactions);
 		String target = StringUtil.getDificultyString(difficulty); //Create a string with difficulty * "0" 
 		System.out.println("Starting mining......");
+		int flag = 0;
 		while(!hash.substring( 0, difficulty).equals(target)) {
 
 			synchronized(MessageHandler.blockReceived){
 				if(MessageHandler.blockReceived){
 					System.out.println("Block received and mining stopped");
-					return 0;
+					flag = 1;
+					break;
 				}
 			}
 			nonce ++;
 			hash = CalculateHash();
+		}
+		if(flag == 1){
+			try {
+				Thread.sleep(500);
+				synchronized(MessageHandler.blockReceived){
+					MessageHandler.blockReceived = false;
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return 0;
 		}
 		System.out.println("Block Mined!!! : " + hash);
 		return 1;
