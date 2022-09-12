@@ -156,7 +156,7 @@ public class MessageHandler {
         }
         if (!msgLookUp.containsKey(message.mId)) {
             messagepool[messageCount] = message;
-            messageCount++;
+            messageCount=(messageCount+1)%10;
             msgLookUp.put(message.mId, message.timestamp);
             System.out.println("received message: "+ message.toString());
             MessageClassifier m = new MessageClassifier(message, client);
