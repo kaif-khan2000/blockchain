@@ -82,7 +82,8 @@ public class StringUtil {
 
 	public static byte[] getSignatureFromString(String signature) {
 		try {
-			return Hex.decodeHex(signature);
+			// return Hex.decodeHex(signature.toCharArray());
+			return Hex.decodeHex(signature.toCharArray());
 		} catch (DecoderException e) {
 			e.printStackTrace();
 		}
@@ -190,14 +191,12 @@ public class StringUtil {
 
 		String data = "Hello World";
 		byte[] signature = StringUtil.applyECDSASig(privateKey1, data);
-		// String sign = StringUtil.getStringFromSignaure(signature);
-		String sign = Base64.getEncoder().encodeToString(signature);
+		String sign = StringUtil.getStringFromSignature(signature);
 		System.out.println(sign);
 
 		
 
-		// byte[] sign_byte = StringUtil.getSignatureFromString(sign);
-		byte[] sign_byte = Base64.getDecoder().decode(sign);
+		byte[] sign_byte = StringUtil.getSignatureFromString(sign);
 		System.out.println(StringUtil.verifyECDSASig(publicKey1, data, sign_byte));
 
 		System.out.println(StringUtil.verifyECDSASig(publicKey1, data, sign_byte));
