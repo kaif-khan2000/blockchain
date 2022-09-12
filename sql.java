@@ -10,7 +10,7 @@ public class sql {
     public static float checkUTXOExist(String transactionOutputId) {
         try {
             Statement stmt = db.con.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from tran_output where utxo = 1 and tranoutput_id = '" + transactionOutputId + "'");
+            ResultSet rs = stmt.executeQuery("select * from tran_output where utxo = 1 and tranoutput_id = '" + transactionOutputId + "';");
             if (rs.next()) {
                 return rs.getFloat("value");
             }
