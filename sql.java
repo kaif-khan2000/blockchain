@@ -71,7 +71,7 @@ public class sql {
                     String transaction_id = rsin.getString("transaction_id");
                     int utxo = Integer.parseInt(rsin.getString("utxo"));
                     TransactionOutput to = new TransactionOutput(address, value, transaction_id,utxo);
-                    TransactionInput tr = new TransactionInput(tran_output,value,to);
+                    TransactionInput tr = new TransactionInput(tran_output);
                     inputs.add(tr);
                 }
                 
