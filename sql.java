@@ -218,7 +218,7 @@ public class sql {
                                 "','" + StringUtil.getStringFromKey(transaction.sender) +
                                 "','" + StringUtil.getStringFromKey(transaction.reciepient) +
                                 "','" + transaction.value +
-                                "','" + StringUtil.getStringFromSignaure(transaction.signature) +
+                                "','" + StringUtil.getStringFromSignature(transaction.signature) +
                                 "','" + newBlock.hash + 
                                 "','" + newBlock.timestamp + "');");
                 if (transaction.inputs != null) {
