@@ -55,7 +55,7 @@ public class Block{
 		for(Transaction t : this.transactions){
 			if(!t.verifyTransaction()){
 				System.out.println("transaction failed to verify");
-				
+
 				return false;
 			}
 		}
@@ -74,9 +74,12 @@ public class Block{
     public int mineBlock(int difficulty) {
 		merkleRoot = StringUtil.getMerkleRoot(transactions);
 		String target = StringUtil.getDificultyString(difficulty); //Create a string with difficulty * "0" 
+		System.out.println("Starting mining......");
 		while(!hash.substring( 0, difficulty).equals(target)) {
+
 			synchronized(MessageHandler.blockReceived){
 				if(MessageHandler.blockReceived){
+					System.out.println("Block received and mining stopped");
 					return 0;
 				}
 			}
