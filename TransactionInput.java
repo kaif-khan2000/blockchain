@@ -14,6 +14,7 @@ public class TransactionInput {
 	public TransactionInput(String transactionInput, float val,TransactionOutput UTXO) {
 		String[] parts = transactionInput.split(delim);
 		this.transactionOutputId = parts[0];
+		this.transactionOutputId.replace("@tipnull", "");
 		this.UTXO = UTXO;
 	}
 
