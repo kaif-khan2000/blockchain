@@ -7,8 +7,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.Base64;
+// import java.util.Base64;
 import com.google.gson.GsonBuilder;
+import org.bouncycastle.util.encoders.Base64;
 import java.util.List;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -68,15 +69,15 @@ public class StringUtil {
 	}
 
 	public static String getStringFromSignature(byte[] signature) {
-
-		String sign = Base64.getEncoder().encodeToString(signature);
+		String sign = new String(Base64.encode(signature));
+		
 		return sign;
 
 	}
 
 	public static byte[] getSignatureFromString(String signature) {
 		
-		byte[] sign = Base64.getDecoder().decode(signature);
+		byte[] sign = Base64.decode(signature.getBytes());
 		return sign;
 
 	}
