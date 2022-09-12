@@ -112,9 +112,9 @@ public class Wallet extends Thread {
                     // //seed node creating a block with 100 coins
                     // To use the below code please comment processTransaction in addTransaction
                     // Block block = new Block(genesisBlock.hash);
-                    // Transaction t = new Transaction(publicKey, publicKey, 100, null);
+                    // Transaction t = new Transaction(publicKey, publicKey, 100, null,100);
                     // ArrayList<TransactionOutput> outputs = new ArrayList<TransactionOutput>();
-                    // outputs.add(new TransactionOutput(t.reciepient, t.value, t.transactionId));
+                    // outputs.add(new TransactionOutput(t.reciepient, t.value, t.transactionId,1));
                     // t.outputs = outputs;
 
                     // t.generateSignature(privateKey);
