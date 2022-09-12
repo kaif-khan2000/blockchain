@@ -36,21 +36,26 @@ public class Block{
 
 	public boolean verifyBlock(){
 		if(!this.prevHash.equals(sql.getLastHash())){
+			System.out.println("Previous hash does not match");
 			return false;
 		}
 		
 		if(!this.hash.equals(this.CalculateHash())){
+			System.out.println("Hash does not match");
 			return false;
 		}
 
 		String target = StringUtil.getDificultyString(Server.difficulty); //Create a string with difficulty * "0"
 		if(!hash.substring( 0, Server.difficulty).equals(target)) {
+			System.out.println("This block hasn't been mined");
 			return false;
 		}
 		 		
 
 		for(Transaction t : this.transactions){
 			if(!t.verifyTransaction()){
+				System.out.println("transaction failed to verify");
+				
 				return false;
 			}
 		}
