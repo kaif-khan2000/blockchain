@@ -73,17 +73,19 @@ public class StringUtil {
 
 	public static String getStringFromSignature(byte[] signature) {
 
-		return Hex.encodeHexString(signature);
+		
+		String sign = Hex.encodeHexString(signature);
 		//String sign = new String(org.bouncycastle.util.encoders.Base64.encode(signature));
 		
-		//return sign;
+		return sign;
 
 	}
 
 	public static byte[] getSignatureFromString(String signature) {
 		try {
 			// return Hex.decodeHex(signature.toCharArray());
-			return Hex.decodeHex(signature.toCharArray());
+			byte[] sign_temp = Hex.decodeHex(signature);
+			return sign_temp;
 		} catch (DecoderException e) {
 			e.printStackTrace();
 		}
@@ -191,14 +193,17 @@ public class StringUtil {
 
 		String data = "Hello World";
 		byte[] signature = StringUtil.applyECDSASig(privateKey1, data);
-		String sign = StringUtil.getStringFromSignature(signature);
+		String sign = Hex.encodeHexString(signature);
 		System.out.println(sign);
+		byte[] sign_byte = null;
+		try {
+			sign_byte = Hex.decodeHex(sign);
+		} catch (DecoderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// System.out.println(StringUtil.verifyECDSASig(publicKey1, data, sign_byte));
 
-		
-
-		byte[] sign_byte = StringUtil.getSignatureFromString(sign);
-		System.out.println(StringUtil.verifyECDSASig(publicKey1, data, sign_byte));
-
-		System.out.println(StringUtil.verifyECDSASig(publicKey1, data, sign_byte));
+		// System.out.println(StringUtil.verifyECDSASig(publicKey1, data, sign_byte));
 	}
 }
