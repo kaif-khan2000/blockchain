@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import com.google.gson.GsonBuilder;
 import org.bouncycastle.util.encoders.Encoder;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import java.util.List;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -64,22 +66,29 @@ public class StringUtil {
 			return ecdsaVerify.verify(signature);
 		} catch (Exception e) {
 			System.out.println(StringUtil.getStringFromSignature(signature));
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
+		return false;
 	}
 
 	public static String getStringFromSignature(byte[] signature) {
 
-		String sign = new String(org.bouncycastle.util.encoders.Base64.encode(signature));
+		return Hex.encodeHexString(signature);
+		//String sign = new String(org.bouncycastle.util.encoders.Base64.encode(signature));
 		
-		return sign;
+		//return sign;
 
 	}
 
 	public static byte[] getSignatureFromString(String signature) {
-		signature = signature.trim();		
-		byte[] sign = org.bouncycastle.util.encoders.Base64.decode(signature.getBytes());
-		return sign;
+		try {
+			return Hex.decodeHex(signature);
+		} catch (DecoderException e) {
+			e.printStackTrace();
+		}
+		// byte[] sign = org.bouncycastle.util.encoders.Base64.decode(signature.getBytes());
+		// return sign;
+		return null;
 
 	}
 
