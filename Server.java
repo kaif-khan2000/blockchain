@@ -283,7 +283,7 @@ public class Server extends Thread {
         sendMessage(seed, message);
     }
 
-    public static int difficulty = 6;
+    public static int difficulty = 4;
 
     public static void build() {
 

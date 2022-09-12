@@ -67,13 +67,13 @@ class MessageClassifier extends Thread{
 		    for(TransactionInput i : transaction.inputs){
 			    float temp = sql.checkUTXOExist(i.transactionOutputId);
                 if(temp == -1){
-                    System.out.println("Transaction input is not valid");
+                    System.out.println("Transaction input is not valid - no utxo found");
                     return;
                 }
                 tempAmount += temp;
             }
             if(tempAmount < transaction.value){
-                System.out.println("Transaction input is not valid");
+                System.out.println("Transaction input is not valid - not enough utxo");
                 return;
             }
 
