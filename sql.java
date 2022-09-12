@@ -226,6 +226,7 @@ public class sql {
                         rs = st.executeUpdate("insert into tran_input(transaction_id,tran_outputid) values " +
                                 "('" + transaction.transactionId.toString() +
                                 "','" + input.transactionOutputId.toString() + "');");
+                        rs = st.executeUpdate("update tran_output set utxo = 0 where tranoutput_id = '" + input.transactionOutputId.toString() + "';");
                     }
                 }
                 for (TransactionOutput output : transaction.outputs) {
